@@ -1,41 +1,48 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+	import { ref } from 'vue'
+	const emit = defineEmits<{
+		(e: 'searchEvent', props: any): void
+	}>()
+	
+	const searchData = defineProps<{
+		data: any,
+	}>();
+	const formData: any = ref(searchData.data);
+	const resultOptions = [
+		{ group: 'White Wins', disable: true },
+		{ label: 'X-0', value: 'X-0', description: 'Search by Any win' },
+		{ label: 'R-0', value: 'R-0', description: 'Search by Road win' },
+		{ label: 'F-0', value: 'F-0', description: 'Search by Flat win' },
+		{ label: '1-0', value: '1-0', description: ' Search by Time win' },
+		{ group: 'Black Wins', disable: true },
+		{ label: '0-X', value: '0-X', description: 'Search by Any win' },
+		{ label: '0-R', value: '0-R', description: 'Search by Road win' },
+		{ label: '0-F', value: '0-F', description: 'Search by Flat win' },
+		{ label: '0-1', value: '0-1', description: ' Search by Time win' },
+		{ group: 'Draw', disable: true },
+		{ label: '1/2-1/2', value: '1/2-1/2', description: 'Search by Draw' }
+	];
+	const sizeOptions = [
+		{ label: '3 x 3', value: '3' },
+		{ label: '4 x 4', value: '4' },
+		{ label: '5 x 5', value: '5' },
+		{ label: '6 x 6', value: '6' },
+		{ label: '7 x 7', value: '7' },
+		{ label: '8 x 8', value: '8' },
+	];
+	const typeOptions: Array<any> = [
+		{ label: "Nomal", value: { name: "normal", value: 1} },
+		{ label: "Tournament", value: { name: "tournament", value: 1 } },
+		{ label: "Unrated", value: { name: "unrated", value: 1 } },
+	];
 
-let formData: any = ref({
-	mirror: false,
-});
+	function clearForm() {
+		formData.value = { mirror: false, partial_user: false}
+	}
 
-const resultOptions = [
-	{ group: 'White Wins', disable: true },
-	{ label: 'X-0', value: 'X-0', description: 'Search by Any win' },
-	{ label: 'R-0', value: 'R-0', description: 'Search by Road win' },
-	{ label: 'F-0', value: 'F-0', description: 'Search by Flat win' },
-	{ label: '1-0', value: '1-0', description: ' Search by Time win' },
-	{ group: 'Black Wins', disable: true },
-	{ label: '0-X', value: '0-X', description: 'Search by Any win' },
-	{ label: '0-R', value: '0-R', description: 'Search by Road win' },
-	{ label: '0-F', value: '0-F', description: 'Search by Flat win' },
-	{ label: '0-1', value: '0-1', description: ' Search by Time win' },
-	{ group: 'Draw', disable: true },
-	{ label: '1/2-1/2', value: '1/2-1/2', description: 'Search by Draw' }
-];
-const sizeOptions = [
-	{ label: '3 x 3', value: '3' },
-	{ label: '4 x 4', value: '4' },
-	{ label: '5 x 5', value: '5' },
-	{ label: '6 x 6', value: '6' },
-	{ label: '7 x 7', value: '7' },
-	{ label: '8 x 8', value: '8' },
-];
-const typeOptions: Array<any> = [
-	{ label: 'Nomal', value: 'normal' },
-	{ label: 'Tournament', value: 'tournament' },
-	{ label: 'Unrated', value: 'unrated' },
-];
-
-function clearForm() {
-	formData.value = { mirror: false}
-}
+	function sendFormData () {
+		emit('searchEvent', formData.value)
+	}
 
 </script>
 
@@ -43,13 +50,13 @@ function clearForm() {
 	<q-card class="my-card q-mt-md">
 		<q-card-section>
 			<h5>Search</h5>
-			<q-form @submit="$emit('searchEvent', formData)" @reset="clearForm()">
+			<q-form @submit="sendFormData" @reset="clearForm()">
 				<div class="row justify-around">
 					<div class="col-4">
 					<q-input v-model="formData.id" label="Game ID" type="number" />
 						<q-input v-model="formData.player_white" label="Player White" />
 						<q-input v-model="formData.player_black" label="Player Black" />
-						<q-checkbox v-model="formData.mirror" label="mirror search params" />
+						
 					</div>
 					<div class="col-4">
 						<q-select v-model="formData.type" :options="typeOptions" label="Game Type" clearable single-line
@@ -72,9 +79,17 @@ function clearForm() {
 						</q-select>
 					</div>
 				</div>
+				<q-expansion-item expand-separator label="Advanced Options" class="row justify-around q-mt-md">
+					<q-card>
+						<q-card-section>
+							<q-toggle v-model="formData.mirror" label="Mirror search" />
+							<q-toggle v-model="formData.partial_user" label="Partial username search" />
+						</q-card-section>
+					</q-card>
+				</q-expansion-item>
 				<div class="row justify-end q-mt-md">
-					<q-btn class="q-mr-md" color="primary" label="Search" type="submit" />
-					<q-btn outline color="" label="Cancel" type="reset" />
+					<q-btn class="q-mr-md" rounded color="primary" label="Search" type="submit" />
+					<q-btn outline rounded color="" label="Cancel" type="reset" />
 				</div>
 			</q-form>
 		</q-card-section>
@@ -87,5 +102,9 @@ h5 {
 }
 .gap-16{
 	gap: 16px;
+}
+
+.q-expansion-item__container {
+	width: 65vw;
 }
 </style>

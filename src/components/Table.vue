@@ -1,7 +1,14 @@
 <script setup lang="ts">
-
+	import { ref } from 'vue';
+	const emit = defineEmits<{
+		(e: 'pageEvent', props: any): void,
+		(e: 'viewEvent', game: any): void,
+		(e: 'downloadEvent', game: any): void,
+		(e: 'openEvent', game: any, site: string, newTab: boolean): void,
+	}>()
 	const tableData = defineProps<{
-		data: any
+		data: any,
+		pagination: {}
 	}>()
 	
 	const columns: any= [
@@ -10,13 +17,16 @@
 		{ name: "size", label: "Size", field: "size", align: "left" },
 		{ name: "rules", label: "Rules", field: "komi", align: "left" },
 		{ name: "clock", label: "Clock", field: "", align: "left" },
+		{ name: "type", label: "Type", field: "", align: "left" },
 		{ name: "white", label: "White", field: "player_white", align: "left" },
 		{ name: "black", label: "Black", field: "player_black", align: "left" },
 		{ name: "result", label: "Result", field: "result", align: "left" },
-		{ name: "notation", label: "Notation", field: "", align: "left" },
-		{ name: "review", label: "Review", field: "", align: "left" }
-	]
-
+		{ name: "notation", label: "Notation", field: "", align: "center" },
+		{ name: "review", label: "Review", field: "", align: "center" }
+	];
+	const rowsPerPage = [15, 25, 50, 100, 0];
+	const pagination: any = ref(tableData.pagination);
+	pagination.page - 1;
 	function formatDate(date: number){
 		let newDate = new Date(date).toISOString().split('T');
 		return `${newDate[0]} ${newDate[1].split('.')[0]}`;
@@ -72,11 +82,46 @@
 			}
 		}
 	}
+	
+	function getGameType(game: any) {
+		if(game.tournament === 1){
+			return "Tournament";
+		} else if(game.unrated === 1){
+			return "Unrated";
+		} else {
+			return "Normal";
+		}
+	}
+	
+	function handleRequest(props: any) {
+		emit('pageEvent', props);
+	}
+	
+	function handleViewPTN(game: any) {
+		emit('viewEvent', game);
+	}
+	
+	function handleDownload(game: any) {
+		emit('downloadEvent', game);
+	}
+	
+	function handleOpen(game: any, site: string){
+		emit('openEvent', game, site, true)
+	}
+
 </script>
 
 <template>
-	<!-- <pre>{{tableData.data.items}}</pre> -->
-	<q-table :rows="tableData.data.items" :columns="columns" row-key="name">
+	<q-table
+		style ="max-height: 50vh"
+		:rows="tableData.data.items" 
+		:columns="columns" 
+		row-key="name" 
+		v-model:pagination="pagination" 
+		:rows-per-page-options="rowsPerPage"
+		virtual-scroll
+		@request="handleRequest"
+		>
 		<template v-slot:body="props">
 			<q-tr :props="props">
 				<q-td key="id" :props="props">
@@ -96,25 +141,36 @@
 				<q-td key="clock" :props="props">
 					{{ formatTimer(props.row.timertime) }} +{{ formatTimer(props.row.timerinc)}}
 				</q-td>
+				<q-td key="type" :props="props">
+					{{getGameType(props.row)}}
+				</q-td>
 				<q-td key="white" :props="props">
-					{{ props.row.player_white }} <br>
+					<a :href="`./?player_white=${props.row.player_white}&mirror=true`" target="_blank" class="text-light-blue">{{
+						props.row.player_white }}</a><br>
 					{{ generateRatingString(props.row, 'white')}}
 				</q-td>
 				<q-td key="black" :props="props">
-					{{ props.row.player_black }} <br>
+					<a :href="`./?player_black=${props.row.player_black}&mirror=true`" target="_blank" class="text-light-blue">{{ props.row.player_black }}</a><br>
 					{{ generateRatingString(props.row, 'black')}}
 				</q-td>
 				<q-td key="result" :props="props">
 					{{props.row.result}}
 				</q-td>
 				<q-td key="notation" :props="props">
-					<!-- TODO -->
+					<q-btn flat round color="light-blue" icon="download" @click="handleDownload(props.row)"/>
+					<q-btn flat round color="light-blue" icon="visibility" @click="handleViewPTN(props.row)"/>
 				</q-td>
 				<q-td key="review" :props="props">
-					<!-- TODO -->
+					<q-btn flat rounded color="light-blue" label="Play Tak" @click="handleOpen(props.row, 'playtak')"/>
+					<q-btn flat rounded color="light-blue" label="PTN Ninja" @click="handleOpen(props.row, 'ptnninja')"/>
 				</q-td>
 			</q-tr>
 		</template>
-		<!-- TODO pagination -->
 	</q-table>
 </template>
+
+<style scoped>
+/* a {
+	color: #fff;
+} */
+</style>
