@@ -184,7 +184,8 @@
 					</div>
 				</q-toolbar-title>
 				<q-space />
-				<q-btn to="/" stretch flat label="Play Tak" />
+				
+				<q-btn href="/" stretch flat label="Play Tak" />
 				<q-btn stretch flat label="Info" @click="viewInfo()"/>
 				<q-toggle v-model="lightMode" color="red" @update:model-value="updateTheme" /><q-icon name="light_mode" size="large" />
 			</q-toolbar>
