@@ -108,7 +108,7 @@
 		const BYTES_PER_MB = (1024 ** 2);
 		let size = Math.floor(dbtemp.size / BYTES_PER_MB);
 		let newdate = new Date(dbtemp.birthtime).toISOString().split('T');
-		let date = `${newdate[0]} ${newdate[1].split('.')[0]}`
+		let date = `${newdate[0]} ${newdate[1].split('.')[0]}`;
 		dbData.value = {size, date};
 		openInfoDialog.value = true;
 	}
@@ -225,7 +225,7 @@
 						<p class="q-mt-md">Games before 23rd April 2016 5:00 PM UTC are anonymized and won't appear when searching with player name</p>
 						<p>
 						Please don't scrape this site. You can directly download the database here: <br>
-						<a href="/games_anan.db">Games Database</a>
+						<a href="/games_anon.db">Games Database</a>
 						({{dbData.size}} MB) (updated on {{dbData.date}}) <br> 
 						note that the notation is in play tak server format.</p>
 						<p>
