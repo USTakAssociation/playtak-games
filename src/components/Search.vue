@@ -10,15 +10,15 @@
 	const formData: any = ref(searchData.data);
 	const resultOptions = [
 		{ group: 'White Wins', disable: true },
-		{ label: 'X-0', value: 'X-0', description: 'Search by Any win' },
-		{ label: 'R-0', value: 'R-0', description: 'Search by Road win' },
-		{ label: 'F-0', value: 'F-0', description: 'Search by Flat win' },
-		{ label: '1-0', value: '1-0', description: 'Search by Time or Resignation win' },
+		{ label: 'X-0', value: 'X-0', description: 'Search by Any Win' },
+		{ label: 'R-0', value: 'R-0', description: 'Search by Road Win' },
+		{ label: 'F-0', value: 'F-0', description: 'Search by Flat Win' },
+		{ label: '1-0', value: '1-0', description: 'Search by Time or Resignation Win' },
 		{ group: 'Black Wins', disable: true },
-		{ label: '0-X', value: '0-X', description: 'Search by Any win' },
-		{ label: '0-R', value: '0-R', description: 'Search by Road win' },
-		{ label: '0-F', value: '0-F', description: 'Search by Flat win' },
-		{ label: '0-1', value: '0-1', description: 'Search by Time or Resignation win' },
+		{ label: '0-X', value: '0-X', description: 'Search by Any Win' },
+		{ label: '0-R', value: '0-R', description: 'Search by Road Win' },
+		{ label: '0-F', value: '0-F', description: 'Search by Flat Win' },
+		{ label: '0-1', value: '0-1', description: 'Search by Time or Resignation Win' },
 		{ group: 'Draw', disable: true },
 		{ label: '1/2-1/2', value: '1/2-1/2', description: 'Search by Draw' }
 	];
