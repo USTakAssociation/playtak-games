@@ -71,11 +71,15 @@
 				delete search[key];
 			}
 		}
+		searchData.value = search;
 		searchGames({}, search);
 	}
 
 	async function searchGames(paginationData: any, search?: any) {
 		isLoading.value = true;
+		if(!search && Object.keys(searchData.value).length > 0) {
+			search = searchData.value;
+		}
 		try {
 			let d = await gameService.getGames(paginationData, search)
 			gameData.value = Object.freeze(d.items);
