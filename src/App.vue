@@ -1,14 +1,16 @@
 <script setup lang="ts">
-	import { ref, onMounted, onBeforeMount } from 'vue';
-	import { Dark } from 'quasar'
+	import { ref, onBeforeMount } from 'vue';
+	import { Dark, useQuasar } from 'quasar';
 	import Search from '@/components/Search.vue';
 	import TableComponent from '@/components/Table.vue'
 	import { PTNService } from '@/services/ptn.service';
 	import { GameService } from '@/services/game.service';
 	
+	const $q = useQuasar();
 	const lightMode = ref(false);
 	const isLoading = ref(false);
 	const gameData = ref({});
+	const gameTemp = ref({});
 	const dbData = ref({size: 0, date: ''});
 	const pagination = ref({
 		page: 0,
@@ -99,8 +101,18 @@
 	}
 	
 	function viewPTN(game: any) {
+		gameTemp.value = game;
 		ptnText.value = ptnService.getPTN(game);
 		openPTNDialog.value = true;
+	}
+	
+	function copyPTN() {
+		try {
+			navigator.clipboard.writeText(ptnText.value);
+			$q.notify({ message: "Copied to clipboard!", position: 'top' });
+		} catch (error) {
+			
+		}
 	}
 	
 	async function viewInfo(){
@@ -214,6 +226,8 @@
 						</div>
 					</q-card-section>
 					<q-card-section class="row items-center q-pt-none">
+						<q-btn label="Copy" icon="content_copy" rounded @click="copyPTN"/>
+						<q-btn label="Download" icon="download" rounded @click="downloadPTN(gameTemp)" />
 						<pre>{{ptnText}}</pre>
 					</q-card-section>
 				</q-card>

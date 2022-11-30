@@ -24,6 +24,7 @@
 		{ name: "notation", label: "Notation", field: "", align: "center" },
 		{ name: "review", label: "Review", field: "", align: "center" }
 	];
+	const visibleColumns = ref(['id', 'date', 'size', 'rules', 'clock', 'type', 'white', 'black', 'result', 'notation', 'review']);
 	const rowsPerPage = [15, 25, 50, 100, 0];
 	const pagination: any = ref(tableData.pagination);
 	pagination.page - 1;
@@ -121,15 +122,19 @@
 		:rows-per-page-options="rowsPerPage"
 		virtual-scroll
 		@request="handleRequest"
-		 color="white"
+		color="white"
+		:visible-columns="visibleColumns"
 		>
+		<template v-slot:top>
+			<div class="full-width row justify-end">
+			<q-select color="light-blue" v-model="visibleColumns" multiple outlined dense options-dense :display-value="$q.lang.table.columns"
+				emit-value map-options :options="columns" option-value="name" options-cover style="min-width: 150px" />
+			</div>
+		</template>
 		<template v-slot:body="props">
 			<q-tr :props="props">
 				<q-td key="id" :props="props">
 					{{ props.row.id }}
-				</q-td>
-				<q-td key="date" :props="props">
-					{{ formatDate(props.row.date) }}
 				</q-td>
 				<q-td key="size" :props="props">
 					{{ props.row.size }}x{{ props.row.size }}
@@ -142,9 +147,6 @@
 				<q-td key="clock" :props="props">
 					{{ formatTimer(props.row.timertime) }} +{{ formatTimer(props.row.timerinc)}}
 				</q-td>
-				<q-td key="type" :props="props">
-					{{getGameType(props.row)}}
-				</q-td>
 				<q-td key="white" :props="props">
 					<a :href="`./?player_white=${props.row.player_white}&mirror=true`" target="_blank" class="text-light-blue">{{
 						props.row.player_white }}</a><br>
@@ -156,6 +158,12 @@
 				</q-td>
 				<q-td key="result" :props="props">
 					{{props.row.result}}
+				</q-td>
+				<q-td key="date" :props="props">
+					{{ formatDate(props.row.date) }}
+				</q-td>
+				<q-td key="type" :props="props">
+					{{getGameType(props.row)}}
 				</q-td>
 				<q-td key="notation" :props="props">
 					<q-btn flat round color="light-blue" icon="download" @click="handleDownload(props.row)"/>
