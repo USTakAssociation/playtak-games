@@ -113,7 +113,7 @@
 
 <template>
 	<q-table
-		style ="max-height: 50vh"
+		style ="max-height: 60vh"
 		:rows="tableData.data.items" 
 		:columns="columns" 
 		row-key="name" 
@@ -121,6 +121,7 @@
 		:rows-per-page-options="rowsPerPage"
 		virtual-scroll
 		@request="handleRequest"
+		 color="white"
 		>
 		<template v-slot:body="props">
 			<q-tr :props="props">
@@ -169,8 +170,6 @@
 	</q-table>
 </template>
 
-<style scoped>
-/* a {
-	color: #fff;
-} */
+<style>
+
 </style>

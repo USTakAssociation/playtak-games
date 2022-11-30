@@ -180,7 +180,7 @@
 								</g>
 							</svg>
 						</div>
-						<span>Game History</span>
+						<span id="app-title">Game History</span>
 					</div>
 				</q-toolbar-title>
 				<q-space />
@@ -281,5 +281,11 @@ path {
 	fill: #fff;
 	stroke: #000;
 	stroke-width: 1px
+}
+
+@media screen and (max-width: 609px){
+	#app-title {
+		display: none;
+	}
 }
 </style>
