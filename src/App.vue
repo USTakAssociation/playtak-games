@@ -42,7 +42,13 @@
 			return viewPTN(gameData);
 		} else {
 			const urlSearchParams = new URLSearchParams(window.location.search);
-			const params = Object.fromEntries(urlSearchParams.entries());
+			const params: any = Object.fromEntries(urlSearchParams.entries());
+			if (params['mirror'] && params['mirror'] === 'true') {
+				params['mirror'] = true;
+			}
+			if(params['size']) {
+				params['size'] = parseInt(params['size']);
+			}
 			searchData.value = params;
 			searchGames({}, params);
 		}
