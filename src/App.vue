@@ -211,6 +211,7 @@
 
 		<q-page-container>
 			<TableComponent
+				class="table-wrapper"
 				:loading="isLoading"
 				:data="gameData" 
 				v-model:pagination="pagination" 
@@ -219,7 +220,7 @@
 				@download-event="downloadPTN"
 				@open-event="openSite"
 			>
-				<q-btn @click="openSearchDialog = true" icon="search" :label="$q.screen.gt.xs ? 'Search' : ''" rounded flat />
+				<q-btn @click="openSearchDialog = true" icon="search" :label="$q.screen.gt.xs ? 'Search' : ''" rounded outline />
 			</TableComponent>
 
 			<Search v-model="openSearchDialog" :data="searchData" @search-event="setSearchData" />
@@ -305,6 +306,11 @@ path {
 	#app-title {
 		display: none;
 	}
+}
+
+.table-wrapper {
+	width: 90vw;
+	margin: 0 auto;
 }
 
 body.desktop {
