@@ -8,7 +8,7 @@
 		(e: 'openEvent', game: any, site: string, newTab: boolean): void,
 	}>()
 	const tableData = defineProps<{
-		data: [],
+		data: any,
 		pagination: {}
 	}>()
 	
