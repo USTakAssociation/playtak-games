@@ -114,7 +114,7 @@
 
 <template>
 	<q-table
-		style ="max-height: 60vh"
+		class="sticky-header"
 		:rows="tableData.data.items" 
 		:columns="columns" 
 		row-key="name" 
@@ -180,4 +180,25 @@
 
 <style>
 
+.sticky-header {
+	max-height: 60vh;
+}
+.sticky-header .q-table__top,
+.sticky-header .q-table__bottom,
+.sticky-header thead tr:first-child th {
+	/* bg color is important for th; just specify one */
+	background-color: auto;
+}
+
+.sticky-header thead tr th {
+	position: sticky;
+	z-index: 1;
+}
+.sticky-header thead tr:last-child th {
+	top: 48px;
+}
+/* height of all previous header rows */
+.sticky-header thead tr:first-child th {
+	top: 0;
+}
 </style>
