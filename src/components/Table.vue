@@ -13,14 +13,14 @@
 	
 	const columns: any= [
 		{ name: "id", label: "ID", field: "id", align: "left" },
-		{ name: "date", label: "Time UTC", field: "date", align: "left" },
 		{ name: "size", label: "Size", field: "size", align: "left" },
 		{ name: "rules", label: "Rules", field: "komi", align: "left" },
 		{ name: "clock", label: "Clock", field: "", align: "left" },
-		{ name: "type", label: "Type", field: "", align: "left" },
 		{ name: "white", label: "White", field: "player_white", align: "left" },
 		{ name: "black", label: "Black", field: "player_black", align: "left" },
 		{ name: "result", label: "Result", field: "result", align: "left" },
+		{ name: "date", label: "Time UTC", field: "date", align: "left" },
+		{ name: "type", label: "Type", field: "", align: "left" },
 		{ name: "notation", label: "Notation", field: "", align: "center" },
 		{ name: "review", label: "Review", field: "", align: "center" }
 	];
