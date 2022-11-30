@@ -47,12 +47,8 @@
 		}
 	})
 
-	if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-		// dark mode
-		Dark.set(true);
-	} else {
-		lightMode.value = true;
-	}
+	Dark.set("auto");
+	lightMode.value = !Dark.isActive;
 	
 	function setSearchData(params: any) {
 		let search = params;
