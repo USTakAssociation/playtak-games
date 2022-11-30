@@ -47,23 +47,30 @@
 </script>
 
 <template>
-	<q-expansion-item expand-separator label="Search" class="search row justify-around q-mt-md" default-opened>
-		<q-card class="my-card q-mt-md">
-			<q-card-section class="search-wrapper">
-				<q-form @submit="sendFormData" @reset="clearForm()">
-					<div class="row justify-around">
-						<div class="col-4">
-						<q-input v-model="formData.id" label="Game ID" type="number" />
-							<q-input v-model="formData.player_white" label="Player White" />
-							<q-input v-model="formData.player_black" label="Player Black" />
-							
-						</div>
-						<div class="col-4">
+	<q-dialog v-bind="$attrs">
+		<q-card>
+			<q-form @submit="sendFormData" @reset="clearForm()">
+				<q-card-section class="row justify-between">
+					<span class="text-h4">Search</span>
+					<div >
+						<q-btn flat round icon="close" v-close-popup />
+					</div>
+				</q-card-section>
+
+				<q-separator />
+
+				<q-card-section style="max-height: 50vh" class="scroll q-pa-none">
+					<div class="row justify-between">
+						<q-list style="min-width: 15em;" class="col">
+							<q-input v-model="formData.id" label="Game ID" type="number" item-aligned />
+							<q-input v-model="formData.player_white" label="Player White" item-aligned />
+							<q-input v-model="formData.player_black" label="Player Black" item-aligned />
+						</q-list>
+						<q-list style="min-width: 15em;" class="col">
 							<q-select v-model="formData.type" :options="typeOptions" label="Game Type" clearable single-line
-								options-selected-class="text-deep-orange">
-							</q-select>
+								options-selected-class="text-deep-orange" item-aligned />
 							<q-select v-model="formData.game_result" :emit-value=true :options="resultOptions" label="Game Result" clearable
-								options-selected-class="text-deep-orange">
+								options-selected-class="text-deep-orange" item-aligned>
 								<template v-slot:option="scope">
 									<q-item-label header v-if="scope.opt.group" v-bind="scope.itemProps">{{ scope.opt.group }}</q-item-label>
 									<q-item v-if="!scope.opt.group" v-bind="scope.itemProps" v-on="scope">
@@ -75,41 +82,24 @@
 								</template>
 							</q-select>
 							<q-select v-model="formData.size" :options="sizeOptions" label="Board Size" clearable single-line
-								options-selected-class="text-deep-orange">
-							</q-select>
+								options-selected-class="text-deep-orange" item-aligned />
+						</q-list>
+						<div style="min-width: 15em;" class="col row justify-around q-py-sm q-mx-md">
+							<q-toggle v-model="formData.mirror" label="Mirror search" />
+							<q-toggle v-model="formData.partial_user" label="Partial username search" />
 						</div>
 					</div>
-					<div class="row justify-around">
-						<q-expansion-item expand-separator label="Advanced Options" class="row justify-around items-start q-mt-md">
-							<q-card>
-								<q-card-section>
-									<q-toggle v-model="formData.mirror" label="Mirror search" /><br>
-									<q-toggle v-model="formData.partial_user" label="Partial username search" />
-								</q-card-section>
-							</q-card>
-						</q-expansion-item>
-						<div class="row justify-end items-start q-mt-md">
-							<q-btn class="q-mr-md" rounded color="primary" label="Search" type="submit" />
-							<q-btn outline rounded color="" label="Cancel" type="reset" />
-						</div>
-					</div>
-				</q-form>
-			</q-card-section>
-		</q-card>
-	</q-expansion-item>
-</template>
+				</q-card-section>
 
-<style>
-h5 {
-	margin: 0;
-}
-.gap-16{
-	gap: 16px;
-}
-.search > .q-expansion-item__container {
-	width: 80vw;
-}
-.search-wrapper {
-	width: 80vw;
-}
-</style>
+				<q-separator />
+				
+				<q-card-actions align="right">
+					<q-btn flat rounded color="primary" label="Reset" type="reset" />
+					<div class="col-grow" />
+					<q-btn flat rounded color="primary" label="Cancel" v-close-popup />
+					<q-btn rounded color="primary" label="Search" type="submit" v-close-popup />
+				</q-card-actions>
+			</q-form>
+		</q-card>
+	</q-dialog>
+</template>

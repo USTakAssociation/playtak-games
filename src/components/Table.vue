@@ -1,13 +1,14 @@
 <script setup lang="ts">
-	import { ref } from 'vue';
+	import { computed, ref } from 'vue';
 	const emit = defineEmits<{
 		(e: 'pageEvent', props: any): void,
 		(e: 'viewEvent', game: any): void,
 		(e: 'downloadEvent', game: any): void,
+		(e: 'update:pagination', game: any): void,
 		(e: 'openEvent', game: any, site: string, newTab: boolean): void,
 	}>()
 	const tableData = defineProps<{
-		data: any,
+		data: [],
 		pagination: {}
 	}>()
 	
@@ -26,8 +27,14 @@
 	];
 	const visibleColumns = ref(['id', 'date', 'size', 'rules', 'clock', 'type', 'white', 'black', 'result', 'notation', 'review']);
 	const rowsPerPage = [15, 25, 50, 100, 0];
-	const pagination: any = ref(tableData.pagination);
-	pagination.page - 1;
+	const pagination: any = computed({
+		get() {
+			return tableData.pagination
+		},
+		set(value) {
+			emit('update:pagination', value);
+		}
+	});
 	function formatDate(date: number){
 		let newDate = new Date(date).toISOString().split('T');
 		return `${newDate[0]} ${newDate[1].split('.')[0]}`;
@@ -115,20 +122,26 @@
 <template>
 	<q-table
 		class="sticky-header"
-		:rows="tableData.data.items" 
+		:rows="tableData.data" 
 		:columns="columns" 
 		row-key="name" 
 		v-model:pagination="pagination" 
 		:rows-per-page-options="rowsPerPage"
 		virtual-scroll
+		:virtual-scroll-item-size="57"
+		:virtual-scroll-sticky-size-start="48"
+		:virtual-scroll-sticky-size-end="50"
 		@request="handleRequest"
-		color="white"
+		color="primary"
 		:visible-columns="visibleColumns"
-		>
+		square
+		flat
+	>
 		<template v-slot:top>
-			<div class="full-width row justify-end">
-			<q-select color="light-blue" v-model="visibleColumns" multiple outlined dense options-dense :display-value="$q.lang.table.columns"
-				emit-value map-options :options="columns" option-value="name" options-cover style="min-width: 150px" />
+			<div class="full-width row justify-between">
+				<slot />
+				<q-select v-model="visibleColumns" multiple outlined dense options-dense :display-value="$q.lang.table.columns"
+				emit-value map-options :options="columns" option-value="name" options-cover style="min-width: 150px" rounded />
 			</div>
 		</template>
 		<template v-slot:body="props">
@@ -148,12 +161,12 @@
 					{{ formatTimer(props.row.timertime) }} +{{ formatTimer(props.row.timerinc)}}
 				</q-td>
 				<q-td key="white" :props="props">
-					<a :href="`./?player_white=${props.row.player_white}&mirror=true`" target="_blank" class="text-light-blue">{{
+					<a :href="`./?player_white=${props.row.player_white}&mirror=true`" target="_blank">{{
 						props.row.player_white }}</a><br>
 					{{ generateRatingString(props.row, 'white')}}
 				</q-td>
 				<q-td key="black" :props="props">
-					<a :href="`./?player_black=${props.row.player_black}&mirror=true`" target="_blank" class="text-light-blue">{{ props.row.player_black }}</a><br>
+					<a :href="`./?player_black=${props.row.player_black}&mirror=true`" target="_blank">{{ props.row.player_black }}</a><br>
 					{{ generateRatingString(props.row, 'black')}}
 				</q-td>
 				<q-td key="result" :props="props">
@@ -166,28 +179,31 @@
 					{{getGameType(props.row)}}
 				</q-td>
 				<q-td key="notation" :props="props">
-					<q-btn flat round color="light-blue" icon="download" @click="handleDownload(props.row)"/>
-					<q-btn flat round color="light-blue" icon="visibility" @click="handleViewPTN(props.row)"/>
+					<q-btn flat round color="primary" icon="download" @click="handleDownload(props.row)"/>
+					<q-btn flat round color="primary" icon="visibility" @click="handleViewPTN(props.row)"/>
 				</q-td>
 				<q-td key="review" :props="props">
-					<q-btn flat rounded color="light-blue" label="Play Tak" @click="handleOpen(props.row, 'playtak')"/>
-					<q-btn flat rounded color="light-blue" label="PTN Ninja" @click="handleOpen(props.row, 'ptnninja')"/>
+					<q-btn flat rounded color="primary" label="Play Tak" @click="handleOpen(props.row, 'playtak')"/>
+					<q-btn flat rounded color="primary" label="PTN Ninja" @click="handleOpen(props.row, 'ptnninja')"/>
 				</q-td>
 			</q-tr>
 		</template>
 	</q-table>
 </template>
 
-<style>
+<style lang="scss">
 
 .sticky-header {
-	max-height: 60vh;
+	height: calc(100vh - #{$toolbar-min-height});
 }
 .sticky-header .q-table__top,
 .sticky-header .q-table__bottom,
 .sticky-header thead tr:first-child th {
 	/* bg color is important for th; just specify one */
-	background-color: auto;
+	background-color: $grey-1;
+	body.body--dark & {
+		background-color: $dark;
+	}
 }
 
 .sticky-header thead tr th {

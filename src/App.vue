@@ -9,7 +9,7 @@
 	const $q = useQuasar();
 	const lightMode = ref(false);
 	const isLoading = ref(false);
-	const gameData = ref({});
+	const gameData = ref([]);
 	const gameTemp = ref({});
 	const dbData = ref({size: 0, date: ''});
 	const pagination = ref({
@@ -18,6 +18,7 @@
 		rowsNumber: 0
 	});
 	const searchData: any = ref({});
+	const openSearchDialog = ref(false);
 	const openPTNDialog = ref(false);
 	const openInfoDialog = ref(false);
 	const ptnText = ref('');
@@ -77,15 +78,14 @@
 		isLoading.value = true;
 		try {
 			let d = await gameService.getGames(paginationData, search)
-			gameData.value = d;
+			gameData.value = Object.freeze(d.items);
 			pagination.value.page = d.page;
 			pagination.value.rowsPerPage = d.perPage;
 			pagination.value.rowsNumber = d.total;
-			isLoading.value = false;
 		} catch (error) {
 			console.error(error);
-			isLoading.value = false;
 		}
+		isLoading.value = false;
 	}
 	
 	async function getGameById(id: string) {
@@ -160,7 +160,7 @@
 
 <template>
 	<q-layout view="hHh lpR fFf">
-		<q-header elevated class="header-bg text-white">
+		<q-header elevated class="text-white bg-secondary">
 			<q-toolbar>
 				<q-toolbar-title>
 					<div class="row items-center no-wrap">
@@ -199,33 +199,38 @@
 			</q-toolbar>
 		</q-header>
 
-		<q-page-container class="container">
-			<Search :data="searchData" @search-event="setSearchData" />
-			<div class="row justify-center align-items-center q-mt-md">
-				<q-spinner class="" color="primary" v-if="isLoading" size="5em"></q-spinner>
-			</div>
-			<TableComponent v-if="gameData && !isLoading" 
+		<q-page-container>
+			<TableComponent
+				:loading="isLoading"
 				:data="gameData" 
-				:pagination="pagination" 
+				v-model:pagination="pagination" 
 				@page-event="searchGames" 
 				@view-event="viewPTN"
 				@download-event="downloadPTN"
 				@open-event="openSite"
-				/>
+			>
+				<q-btn @click="openSearchDialog = true" icon="search" :label="$q.screen.gt.xs ? 'Search' : ''" rounded flat />
+			</TableComponent>
+
+			<Search v-model="openSearchDialog" :data="searchData" @search-event="setSearchData" />
 			
 			<q-dialog v-model="openPTNDialog">
 				<q-card style="width: 300px" class="q-pb-none">
 					<q-card-section class="row justify-between">
-						<h3 class="q-ma-none">PTN</h3>
+						<span class="text-h4">PTN</span>
 						<div >
 							<q-btn flat round icon="close" v-close-popup />
 						</div>
 					</q-card-section>
-					<q-card-section class="row items-center q-pt-none">
-						<q-btn label="Copy" icon="content_copy" rounded @click="copyPTN"/>
-						<q-btn label="Download" icon="download" rounded @click="downloadPTN(gameTemp)" />
-						<pre>{{ptnText}}</pre>
+					<q-separator />
+					<q-card-section style="max-height: 50vh" class="scroll">
+						<span style="white-space: pre-line; font-family: monospace">{{ptnText}}</span>
 					</q-card-section>
+					<q-separator />
+					<q-card-actions align="right">
+						<q-btn label="Copy" icon="content_copy" flat rounded @click="copyPTN" v-close-popup />
+						<q-btn label="Download" icon="download" flat rounded @click="downloadPTN(gameTemp)" v-close-popup />
+					</q-card-actions>
 				</q-card>
 			</q-dialog>
 			
@@ -250,21 +255,14 @@
 	
 </template>
 
-<style scoped>
-.header-bg {
-	background-color: #35455e;
-}
-.container {
-	width: 80vw;
-	margin:  auto;
-}
- a {
-	color: #03a9f4;
- }
+<style lang="scss">
 .logo {
 	min-width: 30px;
 	padding: 8px 0px 0 0px;
 	margin-right: 16px;
+}
+a {
+	color: $primary;
 }
 
 path {
@@ -297,5 +295,47 @@ path {
 	#app-title {
 		display: none;
 	}
+}
+
+body.desktop {
+  &::-webkit-scrollbar-corner,
+  ::-webkit-scrollbar-corner {
+    background: $separator-dark-color;
+  }
+
+  &::-webkit-scrollbar,
+  ::-webkit-scrollbar {
+    width: 14px;
+    height: 14px;
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb,
+  ::-webkit-scrollbar-thumb {
+    border: 0;
+    box-shadow: none;
+    min-height: 40px;
+    background: $grey-5;
+
+    &:hover {
+      background: $grey-6;
+    }
+  }
+
+  &.body--dark {
+    &::-webkit-scrollbar-thumb,
+    ::-webkit-scrollbar-thumb {
+      background: $grey-9;
+
+      &:hover {
+        background: $grey-8;
+      }
+    }
+  }
+
+  &::-webkit-scrollbar-track,
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
 }
 </style>
