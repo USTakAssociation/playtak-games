@@ -309,7 +309,7 @@ path {
 }
 
 .table-wrapper {
-	width: 90vw;
+	max-width: 1300px;
 	margin: 0 auto;
 }
 
