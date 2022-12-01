@@ -1,5 +1,7 @@
 <script setup lang="ts">
 	import { computed, ref } from 'vue';
+	import { LocalStorage } from 'quasar';
+
 	const emit = defineEmits<{
 		(e: 'pageEvent', props: any): void,
 		(e: 'copyEvent', game: any): void,
@@ -26,8 +28,11 @@
 		{ name: "notation", label: "Notation", field: "", align: "center" },
 		{ name: "review", label: "Review", field: "", align: "center" }
 	];
-	const visibleColumns = ref(['id', 'date', 'size', 'rules', 'clock', 'type', 'white', 'black', 'result', 'notation', 'review']);
-	const rowsPerPage = [15, 25, 50, 100, 0];
+	const visibleColumns = ref(
+		LocalStorage.getItem("visibleColumns") ||
+		['id', 'date', 'size', 'rules', 'clock', 'type', 'white', 'black', 'result', 'notation', 'review']
+	);
+	const rowsPerPage = [15, 25, 50, 100];
 	const pagination: any = computed({
 		get() {
 			return tableData.pagination
