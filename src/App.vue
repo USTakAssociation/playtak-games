@@ -112,9 +112,13 @@
 		openPTNDialog.value = true;
 	}
 	
-	function copyPTN() {
+	function copyPTN(game: any) {
 		try {
-			navigator.clipboard.writeText(ptnText.value);
+			let ptn = ptnText.value;
+			if (gameTemp.value !== game) {
+				ptn = ptnService.getPTN(game);
+			}
+			navigator.clipboard.writeText(ptn);
 			$q.notify({ message: "Copied to clipboard!", position: 'top' });
 		} catch (error) {
 			
@@ -216,6 +220,7 @@
 				:data="gameData" 
 				v-model:pagination="pagination" 
 				@page-event="searchGames" 
+				@copy-event="copyPTN"
 				@view-event="viewPTN"
 				@download-event="downloadPTN"
 				@open-event="openSite"
@@ -239,8 +244,8 @@
 					</q-card-section>
 					<q-separator />
 					<q-card-actions align="right">
-						<q-btn label="Copy" icon="content_copy" flat rounded @click="copyPTN" v-close-popup />
-						<q-btn label="Download" icon="download" flat rounded @click="downloadPTN(gameTemp)" v-close-popup />
+						<q-btn label="Copy" icon="content_copy" color="primary" flat rounded @click="copyPTN(gameTemp)" />
+						<q-btn label="Download" icon="download" color="primary" flat rounded @click="downloadPTN(gameTemp)" />
 					</q-card-actions>
 				</q-card>
 			</q-dialog>
