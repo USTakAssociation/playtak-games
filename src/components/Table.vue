@@ -26,7 +26,7 @@
 		{ name: "review", label: "Review", field: "", align: "center" }
 	];
 	const visibleColumns = ref(['id', 'date', 'size', 'rules', 'clock', 'type', 'white', 'black', 'result', 'notation', 'review']);
-	const rowsPerPage = [15, 25, 50, 100, 0];
+	const rowsPerPage = [15, 25, 50, 100];
 	const pagination: any = computed({
 		get() {
 			return tableData.pagination

@@ -302,15 +302,10 @@ path {
 	stroke-width: 1px
 }
 
-@media screen and (max-width: 609px){
-	#app-title {
-		display: none;
-	}
-}
-
 .table-wrapper {
 	width: 90vw;
 	margin: 0 auto;
+	max-width: 1300px;
 }
 
 body.desktop {
@@ -353,5 +348,16 @@ body.desktop {
   ::-webkit-scrollbar-track {
     background: transparent;
   }
+}
+
+@media screen and (max-width: 609px) {
+	#app-title {
+		display: none;
+	}
+
+	.table-wrapper {
+		width: 100vw;
+		margin: auto;
+	}
 }
 </style>
