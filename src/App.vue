@@ -205,7 +205,7 @@
 				
 				<q-btn href="/" stretch flat label="Play Tak" class="text-white" />
 				<q-btn stretch flat label="Info" @click="viewInfo()"/>
-				<q-toggle v-model="lightMode" color="red" @update:model-value="updateTheme" /><q-icon name="light_mode" size="large" />
+				<q-toggle v-model="lightMode" color="accent" @update:model-value="updateTheme" /><q-icon name="light_mode" size="large" />
 			</q-toolbar>
 		</q-header>
 
