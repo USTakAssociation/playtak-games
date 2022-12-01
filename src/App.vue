@@ -17,7 +17,9 @@
 		rowsPerPage: 50,
 		rowsNumber: 0
 	});
-	const searchData: any = ref({});
+	const searchData: any = ref({
+		mirror: false
+	});
 	const openSearchDialog = ref(false);
 	const openPTNDialog = ref(false);
 	const openInfoDialog = ref(false);
@@ -49,10 +51,10 @@
 			if(params['size']) {
 				params['size'] = parseInt(params['size']);
 			}
-			searchData.value = params;
+			searchData.value = Object.assign(searchData.value, params);
 			searchGames({}, params);
 		}
-	})
+	});
 
 	Dark.set("auto");
 	lightMode.value = !Dark.isActive;
@@ -233,8 +235,11 @@
 			<q-dialog v-model="openPTNDialog">
 				<q-card style="width: 300px" class="q-pb-none">
 					<q-card-section class="row justify-between">
-						<span class="text-h4">PTN</span>
-						<div >
+						<div class="text-h4">
+							PTN
+							<div class="text-subtitle1">{{ gameTemp.id }}</div>
+						</div>
+						<div>
 							<q-btn flat round icon="close" v-close-popup />
 						</div>
 					</q-card-section>
@@ -307,15 +312,9 @@ path {
 	stroke-width: 1px
 }
 
-@media screen and (max-width: 609px){
-	#app-title {
-		display: none;
-	}
-}
-
 .table-wrapper {
-	max-width: 1300px;
 	margin: 0 auto;
+	max-width: 1300px;
 }
 
 body.desktop {

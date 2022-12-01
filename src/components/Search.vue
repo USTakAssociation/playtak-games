@@ -37,7 +37,7 @@
 	];
 
 	function clearForm() {
-		formData.value = { mirror: false, partial_user: false}
+		formData.value = { mirror: false }
 	}
 
 	function sendFormData () {
@@ -86,7 +86,6 @@
 						</q-list>
 						<div style="min-width: 15em;" class="col row justify-around q-py-sm q-mx-md">
 							<q-toggle v-model="formData.mirror" label="Mirror search" />
-							<q-toggle v-model="formData.partial_user" label="Partial username search" />
 						</div>
 					</div>
 				</q-card-section>
@@ -94,7 +93,7 @@
 				<q-separator />
 				
 				<q-card-actions align="right">
-					<q-btn flat rounded color="primary" label="Reset" type="reset" />
+					<q-btn flat rounded color="primary" label="Clear" type="reset" />
 					<div class="col-grow" />
 					<q-btn flat rounded color="primary" label="Cancel" v-close-popup />
 					<q-btn rounded color="primary" label="Search" type="submit" v-close-popup />
