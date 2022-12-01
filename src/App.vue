@@ -204,7 +204,7 @@
 								</g>
 							</svg>
 						</div>
-						<span id="app-title">Game History</span>
+						<span v-show="$q.screen.gt.xs">Game History</span>
 					</div>
 				</q-toolbar-title>
 				<q-space />
