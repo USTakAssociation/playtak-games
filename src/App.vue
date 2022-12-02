@@ -17,7 +17,9 @@
 		rowsPerPage: 50,
 		rowsNumber: 0
 	});
-	const searchData: any = ref({});
+	const searchData: any = ref({
+		mirror: false
+	});
 	const openSearchDialog = ref(false);
 	const openPTNDialog = ref(false);
 	const openInfoDialog = ref(false);
@@ -49,10 +51,10 @@
 			if(params['size']) {
 				params['size'] = parseInt(params['size']);
 			}
-			searchData.value = params;
+			searchData.value = Object.assign(searchData.value, params);
 			searchGames({}, params);
 		}
-	})
+	});
 
 	Dark.set("auto");
 	lightMode.value = !Dark.isActive;
@@ -112,9 +114,13 @@
 		openPTNDialog.value = true;
 	}
 	
-	function copyPTN() {
+	function copyPTN(game: any) {
 		try {
-			navigator.clipboard.writeText(ptnText.value);
+			let ptn = ptnText.value;
+			if (gameTemp.value !== game) {
+				ptn = ptnService.getPTN(game);
+			}
+			navigator.clipboard.writeText(ptn);
 			$q.notify({ message: "Copied to clipboard!", position: 'top' });
 		} catch (error) {
 			
@@ -198,14 +204,14 @@
 								</g>
 							</svg>
 						</div>
-						<span id="app-title">Game History</span>
+						<span v-show="$q.screen.gt.xs">Game History</span>
 					</div>
 				</q-toolbar-title>
 				<q-space />
 				
 				<q-btn href="/" stretch flat label="Play Tak" class="text-white" />
 				<q-btn stretch flat label="Info" @click="viewInfo()"/>
-				<q-toggle v-model="lightMode" color="red" @update:model-value="updateTheme" /><q-icon name="light_mode" size="large" />
+				<q-toggle v-model="lightMode" color="accent" @update:model-value="updateTheme" /><q-icon name="light_mode" size="large" />
 			</q-toolbar>
 		</q-header>
 
@@ -216,6 +222,7 @@
 				:data="gameData" 
 				v-model:pagination="pagination" 
 				@page-event="searchGames" 
+				@copy-event="copyPTN"
 				@view-event="viewPTN"
 				@download-event="downloadPTN"
 				@open-event="openSite"
@@ -228,8 +235,11 @@
 			<q-dialog v-model="openPTNDialog">
 				<q-card style="width: 300px" class="q-pb-none">
 					<q-card-section class="row justify-between">
-						<span class="text-h4">PTN</span>
-						<div >
+						<div class="text-h4">
+							PTN
+							<div class="text-subtitle1">{{ gameTemp.id }}</div>
+						</div>
+						<div>
 							<q-btn flat round icon="close" v-close-popup />
 						</div>
 					</q-card-section>
@@ -239,8 +249,8 @@
 					</q-card-section>
 					<q-separator />
 					<q-card-actions align="right">
-						<q-btn label="Copy" icon="content_copy" flat rounded @click="copyPTN" v-close-popup />
-						<q-btn label="Download" icon="download" flat rounded @click="downloadPTN(gameTemp)" v-close-popup />
+						<q-btn label="Copy" icon="content_copy" color="primary" flat rounded @click="copyPTN(gameTemp)" />
+						<q-btn label="Download" icon="download" color="primary" flat rounded @click="downloadPTN(gameTemp)" />
 					</q-card-actions>
 				</q-card>
 			</q-dialog>
@@ -303,7 +313,6 @@ path {
 }
 
 .table-wrapper {
-	width: 90vw;
 	margin: 0 auto;
 	max-width: 1300px;
 }
@@ -348,16 +357,5 @@ body.desktop {
   ::-webkit-scrollbar-track {
     background: transparent;
   }
-}
-
-@media screen and (max-width: 609px) {
-	#app-title {
-		display: none;
-	}
-
-	.table-wrapper {
-		width: 100vw;
-		margin: auto;
-	}
 }
 </style>

@@ -68,9 +68,9 @@
 						</q-list>
 						<q-list style="min-width: 15em;" class="col">
 							<q-select v-model="formData.type" :options="typeOptions" label="Game Type" clearable single-line
-								options-selected-class="text-deep-orange" item-aligned />
+								options-selected-class="text-accent" item-aligned />
 							<q-select v-model="formData.game_result" :emit-value=true :options="resultOptions" label="Game Result" clearable
-								options-selected-class="text-deep-orange" item-aligned>
+								options-selected-class="text-accent" item-aligned>
 								<template v-slot:option="scope">
 									<q-item-label header v-if="scope.opt.group" v-bind="scope.itemProps">{{ scope.opt.group }}</q-item-label>
 									<q-item v-if="!scope.opt.group" v-bind="scope.itemProps" v-on="scope">
@@ -82,7 +82,7 @@
 								</template>
 							</q-select>
 							<q-select v-model="formData.size" :options="sizeOptions" label="Board Size" clearable single-line
-								options-selected-class="text-deep-orange" item-aligned />
+								options-selected-class="text-accent" item-aligned />
 						</q-list>
 						<div style="min-width: 15em;" class="col row justify-around q-py-sm q-mx-md">
 							<q-toggle v-model="formData.mirror" label="Mirror search" />
@@ -93,7 +93,7 @@
 				<q-separator />
 				
 				<q-card-actions align="right">
-					<q-btn flat rounded color="primary" label="Reset" type="reset" />
+					<q-btn flat rounded color="primary" label="Clear" type="reset" />
 					<div class="col-grow" />
 					<q-btn flat rounded color="primary" label="Cancel" v-close-popup />
 					<q-btn rounded color="primary" label="Search" type="submit" v-close-popup />
