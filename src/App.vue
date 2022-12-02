@@ -1,6 +1,6 @@
 <script setup lang="ts">
-	import { ref, onBeforeMount } from 'vue';
-	import { Dark, useQuasar } from 'quasar';
+	import { ref, onBeforeMount, watch } from 'vue';
+	import { Dark, useQuasar, LocalStorage } from 'quasar';
 	import Search from '@/components/Search.vue';
 	import TableComponent from '@/components/Table.vue'
 	import { PTNService } from '@/services/ptn.service';
@@ -26,7 +26,6 @@
 	const ptnText = ref('');
 	const ptnService = new PTNService;
 	const gameService = new GameService;
-	
 	onBeforeMount(async () => {
 		//check pathname values
 		const path = window.location.pathname.split('/');
@@ -58,7 +57,11 @@
 
 	Dark.set("auto");
 	lightMode.value = !Dark.isActive;
-	
+	if (LocalStorage.getItem("lightMode")) {
+		lightMode.value = true;
+		Dark.set(false);
+	}
+
 	function setSearchData(params: any) {
 		let search = params;
 		if(search.type) {
@@ -104,7 +107,8 @@
 		return await gameService.getGameByID(id);
 	}
 	
-	function updateTheme() {
+	function updateTheme(value: boolean) {
+		LocalStorage.set("lightMode", value);
 		Dark.toggle();
 	}
 	
