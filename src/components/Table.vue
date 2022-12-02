@@ -1,5 +1,5 @@
 <script setup lang="ts">
-	import { computed, ref } from 'vue';
+	import { computed, ref, watch } from 'vue';
 	import { LocalStorage } from 'quasar';
 
 	const emit = defineEmits<{
@@ -28,10 +28,6 @@
 		{ name: "notation", label: "Notation", field: "", align: "center" },
 		{ name: "review", label: "Review", field: "", align: "center" }
 	];
-	const visibleColumns = ref(
-		LocalStorage.getItem("visibleColumns") ||
-		['id', 'date', 'size', 'rules', 'clock', 'type', 'white', 'black', 'result', 'notation', 'review']
-	);
 	const rowsPerPage = [15, 25, 50, 100];
 	const pagination: any = computed({
 		get() {
@@ -41,6 +37,13 @@
 			emit('update:pagination', value);
 		}
 	});
+
+	const visibleColumns = ref(
+		LocalStorage.getItem("visibleColumns") ||
+		['id', 'date', 'size', 'rules', 'clock', 'type', 'white', 'black', 'result', 'notation', 'review']
+	);
+	watch(visibleColumns, (value) => LocalStorage.set("visibleColumns", value));
+
 	function formatDate(date: number){
 		let newDate = new Date(date).toISOString().split('T');
 		return `${newDate[0]} ${newDate[1].split('.')[0]}`;
