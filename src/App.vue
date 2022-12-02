@@ -10,7 +10,7 @@
 	const lightMode = ref(false);
 	const isLoading = ref(false);
 	const gameData = ref([]);
-	const gameTemp = ref({});
+	const gameTemp: any = ref({});
 	const dbData = ref({size: 0, date: ''});
 	const pagination = ref({
 		page: 0,

@@ -38,7 +38,7 @@
 		}
 	});
 
-	const visibleColumns = ref(
+	const visibleColumns: any = ref(
 		LocalStorage.getItem("visibleColumns") ||
 		['id', 'date', 'size', 'rules', 'clock', 'type', 'white', 'black', 'result', 'notation', 'review']
 	);
