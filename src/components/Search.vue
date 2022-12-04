@@ -67,10 +67,8 @@
 							<q-input v-model="formData.player_black" label="Player Black" item-aligned />
 						</q-list>
 						<q-list style="min-width: 15em;" class="col">
-							<q-select v-model="formData.type" :options="typeOptions" label="Game Type" clearable single-line
-								options-selected-class="text-accent" item-aligned />
-							<q-select v-model="formData.game_result" :emit-value=true :options="resultOptions" label="Game Result" clearable
-								options-selected-class="text-accent" item-aligned>
+							<q-select v-model="formData.type" :options="typeOptions" label="Game Type" clearable single-line item-aligned />
+							<q-select v-model="formData.game_result" :emit-value=true :options="resultOptions" label="Game Result" clearable item-aligned>
 								<template v-slot:option="scope">
 									<q-item-label header v-if="scope.opt.group" v-bind="scope.itemProps">{{ scope.opt.group }}</q-item-label>
 									<q-item v-if="!scope.opt.group" v-bind="scope.itemProps" v-on="scope">
@@ -81,8 +79,7 @@
 									</q-item>
 								</template>
 							</q-select>
-							<q-select v-model="formData.size" :options="sizeOptions" label="Board Size" clearable single-line
-								options-selected-class="text-accent" item-aligned />
+							<q-select v-model="formData.size" :options="sizeOptions" label="Board Size" clearable single-line item-aligned />
 						</q-list>
 						<div style="min-width: 15em;" class="col row justify-around q-py-sm q-mx-md">
 							<q-toggle v-model="formData.mirror" label="Mirror search" />
