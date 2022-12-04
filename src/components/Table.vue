@@ -153,8 +153,12 @@
 		<template v-slot:top>
 			<div class="full-width row justify-between">
 				<slot />
-				<q-select v-model="visibleColumns" multiple outlined dense options-dense :display-value="$q.lang.table.columns"
-				emit-value map-options :options="columns" option-value="name" options-cover style="min-width: 150px" rounded />
+				<q-select v-model="visibleColumns" multiple outlined dense :display-value="$q.screen.gt.xs ? $q.lang.table.columns : ''"
+				emit-value map-options :options="columns" option-value="name" options-cover rounded>
+					<template v-slot:prepend>
+						<q-icon name="view_column" />
+					</template>
+				</q-select>
 			</div>
 		</template>
 
