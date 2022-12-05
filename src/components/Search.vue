@@ -10,17 +10,17 @@
 	const formData: any = ref(searchData.data);
 	const resultOptions = [
 		{ group: 'White Wins', disable: true },
-		{ label: 'X-0', value: 'X-0', description: 'Search by Any Win' },
-		{ label: 'R-0', value: 'R-0', description: 'Search by Road Win' },
-		{ label: 'F-0', value: 'F-0', description: 'Search by Flat Win' },
-		{ label: '1-0', value: '1-0', description: 'Search by Time or Resignation Win' },
+		{ label: 'X-0', value: 'X-0', description: 'Any Win' },
+		{ label: 'R-0', value: 'R-0', description: 'Road Win' },
+		{ label: 'F-0', value: 'F-0', description: 'Flat Win' },
+		{ label: '1-0', value: '1-0', description: 'Default Win' },
 		{ group: 'Black Wins', disable: true },
-		{ label: '0-X', value: '0-X', description: 'Search by Any Win' },
-		{ label: '0-R', value: '0-R', description: 'Search by Road Win' },
-		{ label: '0-F', value: '0-F', description: 'Search by Flat Win' },
-		{ label: '0-1', value: '0-1', description: 'Search by Time or Resignation Win' },
+		{ label: '0-X', value: '0-X', description: 'Any Win' },
+		{ label: '0-R', value: '0-R', description: 'Road Win' },
+		{ label: '0-F', value: '0-F', description: 'Flat Win' },
+		{ label: '0-1', value: '0-1', description: 'Default Win' },
 		{ group: 'Draw', disable: true },
-		{ label: '1/2-1/2', value: '1/2-1/2', description: 'Search by Draw' }
+		{ label: '1/2-1/2', value: '1/2-1/2', description: 'Draw' }
 	];
 	const sizeOptions = [
 		{ label: '3 x 3', value: '3' },
@@ -67,10 +67,8 @@
 							<q-input v-model="formData.player_black" label="Player Black" item-aligned />
 						</q-list>
 						<q-list style="min-width: 15em;" class="col">
-							<q-select v-model="formData.type" :options="typeOptions" label="Game Type" clearable single-line
-								options-selected-class="text-accent" item-aligned />
-							<q-select v-model="formData.game_result" :emit-value=true :options="resultOptions" label="Game Result" clearable
-								options-selected-class="text-accent" item-aligned>
+							<q-select v-model="formData.type" :options="typeOptions" label="Game Type" clearable single-line item-aligned />
+							<q-select v-model="formData.game_result" :emit-value=true :options="resultOptions" label="Game Result" clearable item-aligned>
 								<template v-slot:option="scope">
 									<q-item-label header v-if="scope.opt.group" v-bind="scope.itemProps">{{ scope.opt.group }}</q-item-label>
 									<q-item v-if="!scope.opt.group" v-bind="scope.itemProps" v-on="scope">
@@ -81,8 +79,7 @@
 									</q-item>
 								</template>
 							</q-select>
-							<q-select v-model="formData.size" :options="sizeOptions" label="Board Size" clearable single-line
-								options-selected-class="text-accent" item-aligned />
+							<q-select v-model="formData.size" :options="sizeOptions" label="Board Size" clearable single-line item-aligned />
 						</q-list>
 						<div style="min-width: 15em;" class="col row justify-around q-py-sm q-mx-md">
 							<q-toggle v-model="formData.mirror" label="Mirror search" />

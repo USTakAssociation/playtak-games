@@ -231,7 +231,7 @@
 				@download-event="downloadPTN"
 				@open-event="openSite"
 			>
-				<q-btn @click="openSearchDialog = true" icon="search" :label="$q.screen.gt.xs ? 'Search' : ''" rounded outline />
+				<q-btn @click="openSearchDialog = true" icon="search" label="Search" rounded outline />
 			</TableComponent>
 
 			<Search v-model="openSearchDialog" :data="searchData" @search-event="setSearchData" />
