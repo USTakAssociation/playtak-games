@@ -1,6 +1,14 @@
-# default
+# Playtak Game History UI
+
+This is the UI for the Game History at playtak.com/games
+
+The backend API can be found here [playtak api](https://github.com/USTakAssociation/playtak-api)
+
+In the future with will be added into the main playtak UI app
 
 ## Project setup
+
+Clone down the repo
 
 ```
 # yarn
@@ -39,6 +47,3 @@ npm run build
 pnpm build
 ```
 
-### Customize configuration
-
-See [Configuration Reference](https://vitejs.dev/config/).
