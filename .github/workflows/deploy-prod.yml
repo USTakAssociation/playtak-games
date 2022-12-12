@@ -59,7 +59,7 @@ jobs:
                   SSH_PORT: ${{ secrets.SSH_PORT }}
               run: |
                 echo "$PRIVATE_KEY" > private_key.pem && chmod 0400 private_key.pem
-                scp -P ${SSH_PORT} -o StrictHostKeyChecking=no -i private_key.pem artifact-beta.tar.gz ${USER_NAME}@${HOSTNAME}:~
+                scp -P ${SSH_PORT} -o StrictHostKeyChecking=no -i private_key.pem artifact-prod.tar.gz ${USER_NAME}@${HOSTNAME}:~
                 ssh -p ${SSH_PORT} -o StrictHostKeyChecking=no -i private_key.pem  ${USER_NAME}@${HOSTNAME} '
                   cd
                   mkdir playtak-games-prod-tmp
