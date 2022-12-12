@@ -1,0 +1,74 @@
+# This is a basic workflow that is manually triggered
+
+name: Build and deploy Playtak games UI Prod
+
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+# or API.
+on:
+    push:
+        branches: [main]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+    # This workflow contains a single job called "build"
+    build:
+        # The type of runner that the job will run on
+        runs-on: ubuntu-latest
+        environment: Prod
+        strategy:
+            matrix:
+                node-version: [14.x]
+
+        # Steps represent a sequence of tasks that will be executed as part of the job
+        steps:
+            # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+            - uses: actions/checkout@v2
+            # Caches NPM and the node_modules folder for faster builds
+            - name: Cache node modules
+              uses: actions/cache@v1
+              with:
+                  path: ~/.npm
+                  key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-node-
+            - name: Node ${{ matrix.node-version }}
+              uses: actions/setup-node@v1
+              with:
+                  node-version: ${{ matrix.node-version }}
+            - run: npm ci
+            # - name: Lint code
+            #   run: npm run lint
+            # - name: Run Unit tests
+            #   run: npm run test
+            - name: Build
+              env: 
+                ENV_VAR_PROD: ${{ secrets.ENV_VAR_PROD }}
+              run: |
+                rm .env.development
+                touch .env
+                echo "$ENV_VAR_PROD" > .env
+                npm run build
+            - name: Prep Artifact
+              run : |
+                tar -czf artifact-prod.tar.gz ./dist 
+            - name: Deploy
+              env: 
+                  PRIVATE_KEY: ${{ secrets.PRIVATE_KEY  }}
+                  HOSTNAME : ${{ secrets.HOSTNAME }}
+                  USER_NAME : ${{ secrets.USER_NAME }}
+                  SSH_PORT: ${{ secrets.SSH_PORT }}
+              run: |
+                echo "$PRIVATE_KEY" > private_key.pem && chmod 0400 private_key.pem
+                scp -P ${SSH_PORT} -o StrictHostKeyChecking=no -i private_key.pem artifact-beta.tar.gz ${USER_NAME}@${HOSTNAME}:~
+                ssh -p ${SSH_PORT} -o StrictHostKeyChecking=no -i private_key.pem  ${USER_NAME}@${HOSTNAME} '
+                  cd
+                  mkdir playtak-games-prod-tmp
+                  tar -xzf artifact-prod.tar.gz -C ./playtak-games-prod-tmp
+                  sudo rm -rf /var/www/html/games
+                  sudo mkdir /var/www/html/games
+                  sudo mv playtak-games-prod-tmp/dist/* /var/www/html/games
+                  bash /gz-html.sh
+                  sudo chown -R root:root /var/www/html
+                  rm -rf playtak-games-prod-tmp
+                  rm artifact-prod.tar.gz
+                '
