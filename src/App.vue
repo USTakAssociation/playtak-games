@@ -28,32 +28,34 @@
 	const gameService = new GameService;
 	onBeforeMount(async () => {
 		//check pathname values
-		const path = window.location.pathname.split('/');
-		console.log(path);
-		if (path[2] === 'playtakviewer') {
-			// playtakviewer
-			const gameData = await getGameById(path[1]);
-			return openSite(gameData, 'playtak')
-		} else if (path[2] === 'ninjaviewer') {
-			// ninjaviewer
-			const gameData = await getGameById(path[1]);
-			return openSite(gameData, 'ptnninja')
-		} else if (path[2] === 'view') {
-			// view raw
-			console.log('view');
-			const gameData = await getGameById(path[1]);
-			return viewPTN(gameData);
-		} else {
-			const urlSearchParams = new URLSearchParams(window.location.search);
-			const params: any = Object.fromEntries(urlSearchParams.entries());
-			if (params['mirror'] && params['mirror'] === 'true') {
-				params['mirror'] = true;
-			}
-			if(params['size']) {
-				params['size'] = parseInt(params['size']);
-			}
-			searchData.value = Object.assign(searchData.value, params);
-			searchGames({}, params);
+		let path = window.location.pathname.split('/');
+		path = path.filter(item => item !== 'games');
+		let gameData;
+		switch (path[2]) {
+			case 'playtakviewer':
+				gameData = await getGameById(path[1]);
+				openSite(gameData, 'playtak');
+				break;
+			case 'ninjaviewer':
+				gameData = await getGameById(path[1]);
+				openSite(gameData, 'ptnninja')
+				break;
+			case 'view':
+				gameData = await getGameById(path[1]);
+				viewPTN(gameData);
+				break;
+			default:
+				const urlSearchParams = new URLSearchParams(window.location.search);
+				const params: any = Object.fromEntries(urlSearchParams.entries());
+				if (params['mirror'] && params['mirror'] === 'true') {
+					params['mirror'] = true;
+				}
+				if (params['size']) {
+					params['size'] = parseInt(params['size']);
+				}
+				searchData.value = Object.assign(searchData.value, params);
+				searchGames({}, params);
+				break;
 		}
 	});
 
