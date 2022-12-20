@@ -43,6 +43,7 @@
 			case 'view':
 				gameData = await getGameById(path[1]);
 				viewPTN(gameData);
+				searchGames({}, {})
 				break;
 			default:
 				const urlSearchParams = new URLSearchParams(window.location.search);
