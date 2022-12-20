@@ -29,6 +29,7 @@
 	onBeforeMount(async () => {
 		//check pathname values
 		const path = window.location.pathname.split('/');
+		console.log(path);
 		if (path[2] === 'playtakviewer') {
 			// playtakviewer
 			const gameData = await getGameById(path[1]);
@@ -39,6 +40,7 @@
 			return openSite(gameData, 'ptnninja')
 		} else if (path[2] === 'view') {
 			// view raw
+			console.log('view');
 			const gameData = await getGameById(path[1]);
 			return viewPTN(gameData);
 		} else {
