@@ -43,7 +43,7 @@
 			case 'view':
 				gameData = await getGameById(path[1]);
 				viewPTN(gameData);
-				searchGames({}, {})
+				searchGames({}, {});
 				break;
 			default:
 				const urlSearchParams = new URLSearchParams(window.location.search);
@@ -97,7 +97,8 @@
 			search = searchData.value;
 		}
 		try {
-			let d = await gameService.getGames(paginationData, search)
+			let d = await gameService.getGames(paginationData, search);
+			if(!d.items) return;
 			gameData.value = Object.freeze(d.items);
 			pagination.value.page = d.page;
 			pagination.value.rowsPerPage = d.perPage;
@@ -140,7 +141,7 @@
 		let dbtemp = await gameService.getDBInfo();
 		const BYTES_PER_MB = (1024 ** 2);
 		let size = Math.floor(dbtemp.size / BYTES_PER_MB);
-		let newdate = new Date(dbtemp.birthtime).toISOString().split('T');
+		let newdate = new Date(dbtemp.mtime).toISOString().split('T');
 		let date = `${newdate[0]} ${newdate[1].split('.')[0]}`;
 		dbData.value = {size, date};
 		openInfoDialog.value = true;

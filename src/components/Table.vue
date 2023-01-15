@@ -140,10 +140,6 @@
 		row-key="name" 
 		v-model:pagination="pagination" 
 		:rows-per-page-options="rowsPerPage"
-		virtual-scroll
-		:virtual-scroll-item-size="57"
-		:virtual-scroll-sticky-size-start="48"
-		:virtual-scroll-sticky-size-end="50"
 		@request="handleRequest"
 		color="primary"
 		:visible-columns="visibleColumns"
