@@ -325,7 +325,7 @@ path {
 
 .table-wrapper {
 	margin: 0 auto;
-	max-width: 1300px;
+	max-width: 1400px;
 }
 
 body.desktop {
