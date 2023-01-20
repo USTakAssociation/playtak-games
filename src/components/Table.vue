@@ -18,7 +18,7 @@
 	const columns: any= [
 		{ name: "id", label: "ID", field: "id", align: "left" },
 		{ name: "size", label: "Size", field: "size", align: "left" },
-		{ name: "rules", label: "Rules", field: "komi", align: "left" },
+		{ name: "komi", label: "Komi", field: "komi", align: "left" },
 		{ name: "clock", label: "Clock", field: "", align: "left" },
 		{ name: "white", label: "White", field: "player_white", align: "left" },
 		{ name: "black", label: "Black", field: "player_black", align: "left" },
@@ -40,7 +40,7 @@
 
 	const visibleColumns: any = ref(
 		LocalStorage.getItem("visibleColumns") ||
-		['id', 'date', 'size', 'rules', 'clock', 'type', 'white', 'black', 'result', 'notation', 'review']
+		['id', 'date', 'size', 'komi', 'clock', 'type', 'white', 'black', 'result', 'notation', 'review']
 	);
 	watch(visibleColumns, (value) => LocalStorage.set("visibleColumns", value));
 
@@ -166,9 +166,9 @@
 				<q-td key="size" :props="props">
 					{{ props.row.size }}x{{ props.row.size }}
 				</q-td>
-				<q-td key="rules" :props="props">
+				<q-td key="komi" :props="props">
 					<span v-if="props.row.komi > 0">
-						Komi: {{ formatKomi(props.row.komi) }}
+						{{ formatKomi(props.row.komi) }}
 					</span>
 				</q-td>
 				<q-td key="clock" :props="props">
