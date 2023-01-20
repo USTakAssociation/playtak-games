@@ -31,19 +31,19 @@
 		let path = window.location.pathname.split('/');
 		path = path.filter(item => item !== 'games');
 		let gameData;
-		switch (path[1]) {
+		switch (path[2]) {
 			case 'playtakviewer':
-				gameData = await getGameById(path[2]);
+				gameData = await getGameById(path[1]);
 				let pturl = `https://playtak.com/?load=${encodeURI(ptnService.getPTN(gameData))}`
 				window.location.assign(pturl);
 				break;
 			case 'ninjaviewer':
-				gameData = await getGameById(path[2]);
+				gameData = await getGameById(path[1]);
 				let nurl = `https://ptn.ninja/${encodeURI(ptnService.getPTN(gameData))}`;
 				window.location.assign(nurl);
 				break;
 			case 'view':
-				gameData = await getGameById(path[2]);
+				gameData = await getGameById(path[1]);
 				viewPTN(gameData);
 				searchGames({}, {});
 				break;

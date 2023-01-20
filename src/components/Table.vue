@@ -18,7 +18,7 @@
 	const columns: any= [
 		{ name: "id", label: "ID", field: "id", align: "left" },
 		{ name: "size", label: "Size", field: "size", align: "left" },
-		{ name: "komi", label: "Komi", field: "komi", align: "left" },
+		{ name: "rules", label: "Rules", field: "rules", align: "left" },
 		{ name: "clock", label: "Clock", field: "", align: "left" },
 		{ name: "white", label: "White", field: "player_white", align: "left" },
 		{ name: "black", label: "Black", field: "player_black", align: "left" },
@@ -40,7 +40,7 @@
 
 	const visibleColumns: any = ref(
 		LocalStorage.getItem("visibleColumns") ||
-		['id', 'date', 'size', 'komi', 'clock', 'type', 'white', 'black', 'result', 'notation', 'review']
+		['id', 'date', 'size', 'rules', 'clock', 'type', 'white', 'black', 'result', 'notation', 'review']
 	);
 	watch(visibleColumns, (value) => LocalStorage.set("visibleColumns", value));
 
@@ -95,6 +95,17 @@
 		}
 	}
 	
+	function hasPieceVariation(game: any) {
+		const stdpieces = [0, 0, 0, 10, 15, 21, 30, 40, 50][game.size];
+		const stdcaps = [0, 0, 0, 0, 0, 1, 1, 2, 2][game.size];
+		const gpieces = game.pieces == -1 ? stdpieces : game.pieces;
+		const gcaps = game.capstones == -1 ? stdcaps : game.capstones;
+		if (gpieces != stdpieces || gcaps != stdcaps){
+			return true;
+		}
+		return false;
+	}
+	
 	function handleRequest(props: any) {
 		emit('pageEvent', props);
 	}
@@ -147,9 +158,13 @@
 				<q-td key="size" :props="props">
 					{{ props.row.size }}x{{ props.row.size }}
 				</q-td>
-				<q-td key="komi" :props="props">
+				<q-td key="rules" :props="props">
 					<span v-if="props.row.komi > 0">
-						{{ formatKomi(props.row.komi) }}
+						Komi: {{ formatKomi(props.row.komi) }}
+						<br>
+					</span> 
+					<span v-if="hasPieceVariation(props.row)">
+						Pieces: {{props.row.pieces}}/{{props.row.capstones}}
 					</span>
 				</q-td>
 				<q-td key="clock" :props="props">
@@ -188,11 +203,9 @@
 						<q-btn icon="download" @click="handleDownload(props.row)" color="primary" flat />
 					</q-btn-group>
 				</q-td>
-				<q-td key="review" :props="props">
-					<q-btn-group flat rounded>
-						<q-btn label="Play Tak" :href="'/games/playtakviewer/' + props.row.id" target="_blank" color="primary" flat />
-						<q-btn label="PTN Ninja" :href="'/games/ninjaviewer/' + props.row.id" target="_blank" color="primary" flat />
-					</q-btn-group>
+				<q-td key="review" :props="props" class="text-left">
+					<a :href="'/games/' + props.row.id + '/playtakviewer'" target="_blank" color="primary">Play Tak</a><br>
+					<a :href="'/games/' + props.row.id+ '/ninjaviewer'" target="_blank" color="primary">PTN Ninja</a>
 				</q-td>
 			</q-tr>
 		</template>
