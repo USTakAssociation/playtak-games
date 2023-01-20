@@ -54,22 +54,7 @@
 		const k2 = ((komi % 2) * 5).toString();
 		return `${k1}.${k2}`;
 	}
-	
-	function formatTimer(time: number) {
-		let outstr = '';
-		let minutes = Math.floor((time / 60));
-		if (minutes > 0) {
-			outstr = minutes.toString();
-		}
-		let seconds = time % 60;
-		outstr += ':';
-		if (seconds < 10) {
-			outstr += '0';
-		}
-		outstr += seconds.toString();
-		return outstr
-	}
-	
+
 	function formatRatingChange(change: number) {
 		let sign = "+";
 		if (change < 0) {
@@ -124,10 +109,6 @@
 	
 	function handleDownload(game: any) {
 		emit('downloadEvent', game);
-	}
-	
-	function handleOpen(game: any, site: string){
-		emit('openEvent', game, site, true)
 	}
 
 </script>
@@ -209,8 +190,8 @@
 				</q-td>
 				<q-td key="review" :props="props">
 					<q-btn-group flat rounded>
-						<q-btn label="Play Tak" @click="handleOpen(props.row, 'playtak')" color="primary" flat />
-						<q-btn label="PTN Ninja" @click="handleOpen(props.row, 'ptnninja')" color="primary" flat />
+						<q-btn label="Play Tak" :href="'/games/playtakviewer/' + props.row.id" target="_blank" color="primary" flat />
+						<q-btn label="PTN Ninja" :href="'/games/ninjaviewer/' + props.row.id" target="_blank" color="primary" flat />
 					</q-btn-group>
 				</q-td>
 			</q-tr>

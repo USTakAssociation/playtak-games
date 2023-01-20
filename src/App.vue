@@ -31,17 +31,19 @@
 		let path = window.location.pathname.split('/');
 		path = path.filter(item => item !== 'games');
 		let gameData;
-		switch (path[2]) {
+		switch (path[1]) {
 			case 'playtakviewer':
-				gameData = await getGameById(path[1]);
-				openSite(gameData, 'playtak');
+				gameData = await getGameById(path[2]);
+				let pturl = `https://playtak.com/?load=${encodeURI(ptnService.getPTN(gameData))}`
+				window.location.assign(pturl);
 				break;
 			case 'ninjaviewer':
-				gameData = await getGameById(path[1]);
-				openSite(gameData, 'ptnninja')
+				gameData = await getGameById(path[2]);
+				let nurl = `https://ptn.ninja/${encodeURI(ptnService.getPTN(gameData))}`;
+				window.location.assign(nurl);
 				break;
 			case 'view':
-				gameData = await getGameById(path[1]);
+				gameData = await getGameById(path[2]);
 				viewPTN(gameData);
 				searchGames({}, {});
 				break;
@@ -55,7 +57,6 @@
 					params['size'] = parseInt(params['size']);
 				}
 				searchData.value = Object.assign(searchData.value, params);
-				// TODO add per page/limit to pagination
 				searchGames({}, params);
 				break;
 		}
@@ -163,26 +164,6 @@
 		document.body.appendChild(link);
 		link.click();
 	}
-	
-	function openSite(game: any, site: string, newTab?: boolean){
-		if(site === 'playtak') {
-			const url = `https://playtak.com/?load=${encodeURI(ptnService.getPTN(game))}`
-			if(newTab){
-				window.open(url, "_blank");
-				return;
-			}
-			window.location.assign(url);
-		}
-		
-		if(site === 'ptnninja') {
-			const url = `https://ptn.ninja/${encodeURI(ptnService.getPTN(game))}`;
-			if (newTab) {
-				window.open(url, "_blank");
-				return;
-			}
-			window.location.assign(url);
-		}
-	}
 </script>
 
 <template>
@@ -236,7 +217,6 @@
 				@copy-event="copyPTN"
 				@view-event="viewPTN"
 				@download-event="downloadPTN"
-				@open-event="openSite"
 			>
 				<q-btn @click="openSearchDialog = true" icon="search" label="Search" rounded outline />
 			</TableComponent>
