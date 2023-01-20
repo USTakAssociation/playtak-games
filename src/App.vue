@@ -1,5 +1,5 @@
 <script setup lang="ts">
-	import { ref, onBeforeMount, watch } from 'vue';
+	import { ref, onBeforeMount, toRaw } from 'vue';
 	import { Dark, useQuasar, LocalStorage } from 'quasar';
 	import Search from '@/components/Search.vue';
 	import TableComponent from '@/components/Table.vue'
@@ -55,6 +55,7 @@
 					params['size'] = parseInt(params['size']);
 				}
 				searchData.value = Object.assign(searchData.value, params);
+				// TODO add per page/limit to pagination
 				searchGames({}, params);
 				break;
 		}
@@ -73,7 +74,7 @@
 			search[search.type.value.name] = search.type.value.value;
 		}
 		if(search.size){
-			search.size = search.size.value;
+			search.size = search.size.value || search.size;
 		}
 		if (search.type === null){
 			delete search.normal;
@@ -88,7 +89,7 @@
 			}
 		}
 		searchData.value = search;
-		searchGames({}, search);
+		searchGames({ pagination: toRaw(pagination).value}, search);
 	}
 
 	async function searchGames(paginationData: any, search?: any) {

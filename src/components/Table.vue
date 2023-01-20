@@ -58,10 +58,10 @@
 	function formatTimer(time: number) {
 		let outstr = '';
 		let minutes = Math.floor((time / 60));
-		let seconds = time % 60;
 		if (minutes > 0) {
 			outstr = minutes.toString();
 		}
+		let seconds = time % 60;
 		outstr += ':';
 		if (seconds < 10) {
 			outstr += '0';
@@ -168,11 +168,19 @@
 				</q-td>
 				<q-td key="rules" :props="props">
 					<span v-if="props.row.komi > 0">
-					 Komi: {{ formatKomi(props.row.komi) }}
+						Komi: {{ formatKomi(props.row.komi) }}
 					</span>
 				</q-td>
 				<q-td key="clock" :props="props">
-					{{ formatTimer(props.row.timertime) }} +{{ formatTimer(props.row.timerinc)}}
+					<div v-if="props.row.date >= 1461430800000">
+						{{ props.row.timertime /60 }}m +{{ props.row.timerinc }}s inc<br />
+						<span v-if="props.row.extra_time_trigger > 0">
+							+{{props.row.extra_time_amount / 60}}m @{{props.row.extra_time_trigger}}
+							<q-tooltip anchor="center right" self="center left" :offset="[10, 10]">
+								Extra Time: adds time at specific move
+							</q-tooltip>
+						</span>
+					</div>
 				</q-td>
 				<q-td key="white" :props="props">
 					<a :href="`./?player_white=${props.row.player_white}&mirror=true`" target="_blank">{{
