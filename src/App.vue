@@ -48,6 +48,12 @@
 				searchGames({}, {});
 				break;
 			default:
+				if (path[1].length > 0) {
+					gameData = await getGameById(path[1]);
+					if(gameData){
+						downloadPTN(gameData);
+					}
+				}
 				const urlSearchParams = new URLSearchParams(window.location.search);
 				const params: any = Object.fromEntries(urlSearchParams.entries());
 				if (params['mirror'] && params['mirror'] === 'true') {
