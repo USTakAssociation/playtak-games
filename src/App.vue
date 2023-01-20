@@ -48,10 +48,14 @@
 				searchGames({}, {});
 				break;
 			default:
-				if (path[1].length > 0) {
-					gameData = await getGameById(path[1]);
-					if(gameData){
-						downloadPTN(gameData);
+				if (path[1].length > 0 && parseInt(path[1])) {
+					try {
+						gameData = await getGameById(path[1]);
+						if(gameData && !gameData.statusCode){
+							downloadPTN(gameData);
+						}
+					} catch (error) {
+						console.error(error);
 					}
 				}
 				const urlSearchParams = new URLSearchParams(window.location.search);
