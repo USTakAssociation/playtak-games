@@ -11,7 +11,7 @@
 	const isLoading = ref(false);
 	const gameData = ref([]);
 	const gameTemp: any = ref({});
-	const dbData = ref({size: 0, date: ''});
+	const dbData = ref({size: '0B', date: ''});
 	const pagination = ref({
 		page: 0,
 		rowsPerPage: 50,
@@ -150,13 +150,21 @@
 	}
 	
 	async function viewInfo(){
-		let dbtemp = await gameService.getDBInfo();
-		const BYTES_PER_MB = (1024 ** 2);
-		let size = Math.floor(dbtemp.size / BYTES_PER_MB);
-		let newdate = new Date(dbtemp.mtime).toISOString().split('T');
-		let date = `${newdate[0]} ${newdate[1].split('.')[0]}`;
+		const dbtemp = await gameService.getDBInfo();
+		const size = formatBytes(dbtemp.size);
+		const newdate = new Date(dbtemp.mtime).toISOString().split('T');
+		const date = `${newdate[0]} ${newdate[1].split('.')[0]}`;
 		dbData.value = {size, date};
 		openInfoDialog.value = true;
+	}
+	
+	function formatBytes(bytes: number, decimals = 2): string {
+		if (!+bytes) return '0 Bytes';
+		const k = 1000;
+		const dm = decimals < 0 ? 0 : decimals
+		const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+		const i = Math.floor(Math.log(bytes) / Math.log(k))
+		return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
 	}
 	
 	function getZero(t: any) {
@@ -262,8 +270,8 @@
 						<p class="q-mt-md">Games before 23rd April 2016 5:00 PM UTC are anonymized and won't appear when searching with player name</p>
 						<p>
 							Please don't scrape this site. You can directly download the database here: <br>
-							<a href="/games_anon.db">Games Database</a>
-							({{dbData.size}} MB) (updated on {{dbData.date}}) <br> 
+							<a href="/games_anon.db.gz">Games Database</a>
+							(~{{dbData.size}}) (updated on {{dbData.date}}) <br> 
 							note that the notation is in play tak server format.
 						</p>
 						<p>
