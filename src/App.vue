@@ -162,7 +162,7 @@
 		if (!+bytes) return '0 Bytes'
 		const k = 1024
 		const dm = decimals < 0 ? 0 : decimals
-		const sizes = ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']
+		const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
 
 		const i = Math.floor(Math.log(bytes) / Math.log(k))
 
@@ -273,7 +273,7 @@
 						<p>
 							Please don't scrape this site. You can directly download the database here: <br>
 							<a href="/games_anon.db.gz">Games Database</a>
-							(~{{dbData.size}} MB) (updated on {{dbData.date}}) <br> 
+							(~{{dbData.size}}) (updated on {{dbData.date}}) <br> 
 							note that the notation is in play tak server format.
 						</p>
 						<p>
