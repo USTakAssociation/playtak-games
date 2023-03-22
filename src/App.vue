@@ -1,5 +1,5 @@
 <script setup lang="ts">
-	import { ref, onBeforeMount, watch } from 'vue';
+	import { ref, onBeforeMount, toRaw } from 'vue';
 	import { Dark, useQuasar, LocalStorage } from 'quasar';
 	import Search from '@/components/Search.vue';
 	import TableComponent from '@/components/Table.vue'
@@ -28,30 +28,47 @@
 	const gameService = new GameService;
 	onBeforeMount(async () => {
 		//check pathname values
-		const path = window.location.pathname.split('/');
-		if (path[2] === 'playtakviewer') {
-			// playtakviewer
-			const gameData = await getGameById(path[1]);
-			return openSite(gameData, 'playtak')
-		} else if (path[2] === 'ninjaviewer') {
-			// ninjaviewer
-			const gameData = await getGameById(path[1]);
-			return openSite(gameData, 'ptnninja')
-		} else if (path[2] === 'view') {
-			// view raw
-			const gameData = await getGameById(path[1]);
-			return viewPTN(gameData);
-		} else {
-			const urlSearchParams = new URLSearchParams(window.location.search);
-			const params: any = Object.fromEntries(urlSearchParams.entries());
-			if (params['mirror'] && params['mirror'] === 'true') {
-				params['mirror'] = true;
-			}
-			if(params['size']) {
-				params['size'] = parseInt(params['size']);
-			}
-			searchData.value = Object.assign(searchData.value, params);
-			searchGames({}, params);
+		let path = window.location.pathname.split('/');
+		path = path.filter(item => item !== 'games');
+		let gameData;
+		switch (path[2]) {
+			case 'playtakviewer':
+				gameData = await getGameById(path[1]);
+				let pturl = `https://playtak.com/?load=${encodeURI(ptnService.getPTN(gameData))}`
+				window.location.assign(pturl);
+				break;
+			case 'ninjaviewer':
+				gameData = await getGameById(path[1]);
+				let nurl = `https://ptn.ninja/${encodeURI(ptnService.getPTN(gameData))}`;
+				window.location.assign(nurl);
+				break;
+			case 'view':
+				gameData = await getGameById(path[1]);
+				viewPTN(gameData);
+				searchGames({}, {});
+				break;
+			default:
+				if (path[1].length > 0 && parseInt(path[1])) {
+					try {
+						gameData = await getGameById(path[1]);
+						if(gameData && !gameData.statusCode){
+							downloadPTN(gameData);
+						}
+					} catch (error) {
+						console.error(error);
+					}
+				}
+				const urlSearchParams = new URLSearchParams(window.location.search);
+				const params: any = Object.fromEntries(urlSearchParams.entries());
+				if (params['mirror'] && params['mirror'] === 'true') {
+					params['mirror'] = true;
+				}
+				if (params['size']) {
+					params['size'] = parseInt(params['size']);
+				}
+				searchData.value = Object.assign(searchData.value, params);
+				searchGames({}, params);
+				break;
 		}
 	});
 
@@ -68,7 +85,7 @@
 			search[search.type.value.name] = search.type.value.value;
 		}
 		if(search.size){
-			search.size = search.size.value;
+			search.size = search.size.value || search.size;
 		}
 		if (search.type === null){
 			delete search.normal;
@@ -83,7 +100,7 @@
 			}
 		}
 		searchData.value = search;
-		searchGames({}, search);
+		searchGames({ pagination: toRaw(pagination).value}, search);
 	}
 
 	async function searchGames(paginationData: any, search?: any) {
@@ -92,7 +109,8 @@
 			search = searchData.value;
 		}
 		try {
-			let d = await gameService.getGames(paginationData, search)
+			let d = await gameService.getGames(paginationData, search);
+			if(!d.items) return;
 			gameData.value = Object.freeze(d.items);
 			pagination.value.page = d.page;
 			pagination.value.rowsPerPage = d.perPage;
@@ -135,7 +153,7 @@
 		let dbtemp = await gameService.getDBInfo();
 		const BYTES_PER_MB = (1024 ** 2);
 		let size = Math.floor(dbtemp.size / BYTES_PER_MB);
-		let newdate = new Date(dbtemp.birthtime).toISOString().split('T');
+		let newdate = new Date(dbtemp.mtime).toISOString().split('T');
 		let date = `${newdate[0]} ${newdate[1].split('.')[0]}`;
 		dbData.value = {size, date};
 		openInfoDialog.value = true;
@@ -155,26 +173,6 @@
 		link.setAttribute('download', `${game.player_white}-vs-${game.player_black}-${dt}.ptn`);
 		document.body.appendChild(link);
 		link.click();
-	}
-	
-	function openSite(game: any, site: string, newTab?: boolean){
-		if(site === 'playtak') {
-			const url = `https://playtak.com/?load=${encodeURI(ptnService.getPTN(game))}`
-			if(newTab){
-				window.open(url, "_blank");
-				return;
-			}
-			window.location.assign(url);
-		}
-		
-		if(site === 'ptnninja') {
-			const url = `https://ptn.ninja/${encodeURI(ptnService.getPTN(game))}`;
-			if (newTab) {
-				window.open(url, "_blank");
-				return;
-			}
-			window.location.assign(url);
-		}
 	}
 </script>
 
@@ -229,7 +227,6 @@
 				@copy-event="copyPTN"
 				@view-event="viewPTN"
 				@download-event="downloadPTN"
-				@open-event="openSite"
 			>
 				<q-btn @click="openSearchDialog = true" icon="search" label="Search" rounded outline />
 			</TableComponent>
@@ -264,12 +261,16 @@
 					<q-card-section class="row items-center q-pt-none">
 						<p class="q-mt-md">Games before 23rd April 2016 5:00 PM UTC are anonymized and won't appear when searching with player name</p>
 						<p>
-						Please don't scrape this site. You can directly download the database here: <br>
-						<a href="/games_anon.db">Games Database</a>
-						({{dbData.size}} MB) (updated on {{dbData.date}}) <br> 
-						note that the notation is in play tak server format.</p>
+							Please don't scrape this site. You can directly download the database here: <br>
+							<a href="/games_anon.db">Games Database</a>
+							({{dbData.size}} MB) (updated on {{dbData.date}}) <br> 
+							note that the notation is in play tak server format.
+						</p>
 						<p>
-						The link above will be updated with latest database every day at 5:00 PM UTC.
+							The link above will be updated with latest database every day at 5:00 PM UTC.
+						</p>
+						<p>
+							In the player name search fields you can do a partial search with % at the start, end, or both. ie %ame or nam% or %am%
 						</p>
 					</q-card-section>
 				</q-card>
@@ -318,7 +319,7 @@ path {
 
 .table-wrapper {
 	margin: 0 auto;
-	max-width: 1300px;
+	max-width: 1400px;
 }
 
 body.desktop {

@@ -31,7 +31,7 @@
 		{ label: '8 x 8', value: '8' },
 	];
 	const typeOptions: Array<any> = [
-		{ label: "Nomal", value: { name: "normal", value: 1} },
+		{ label: "Normal", value: { name: "normal", value: 1} },
 		{ label: "Tournament", value: { name: "tournament", value: 1 } },
 		{ label: "Unrated", value: { name: "unrated", value: 1 } },
 	];
@@ -79,7 +79,7 @@
 									</q-item>
 								</template>
 							</q-select>
-							<q-select v-model="formData.size" :options="sizeOptions" label="Board Size" clearable single-line item-aligned />
+							<q-select v-model="formData.size" :options="sizeOptions" label="Board Size" map-options clearable single-line item-aligned />
 						</q-list>
 						<div style="min-width: 15em;" class="col row justify-around q-py-sm q-mx-md">
 							<q-toggle v-model="formData.mirror" label="Mirror search" />

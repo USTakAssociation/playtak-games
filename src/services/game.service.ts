@@ -1,5 +1,5 @@
 export class GameService {
-	private API_HOST = import.meta.env.VITE_API_HOST + '/games'
+	private API_HOST = import.meta.env.VITE_API_HOST + '/games-history'
 
 	public async getGames(paginationData?: any, searchData?: any) {
 		try {
@@ -20,7 +20,7 @@ export class GameService {
 			});
 			return await results.json();
 		} catch (error) {
-			console.error(error);
+			console.error('Error: ', error);
 		}
 	}
 

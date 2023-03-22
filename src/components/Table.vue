@@ -18,7 +18,7 @@
 	const columns: any= [
 		{ name: "id", label: "ID", field: "id", align: "left" },
 		{ name: "size", label: "Size", field: "size", align: "left" },
-		{ name: "rules", label: "Rules", field: "komi", align: "left" },
+		{ name: "rules", label: "Rules", field: "rules", align: "left" },
 		{ name: "clock", label: "Clock", field: "", align: "left" },
 		{ name: "white", label: "White", field: "player_white", align: "left" },
 		{ name: "black", label: "Black", field: "player_black", align: "left" },
@@ -54,22 +54,7 @@
 		const k2 = ((komi % 2) * 5).toString();
 		return `${k1}.${k2}`;
 	}
-	
-	function formatTimer(time: number) {
-		let outstr = '';
-		let minutes = Math.floor((time / 60));
-		let seconds = time % 60;
-		if (minutes > 0) {
-			outstr = minutes.toString();
-		}
-		outstr += ':';
-		if (seconds < 10) {
-			outstr += '0';
-		}
-		outstr += seconds.toString();
-		return outstr
-	}
-	
+
 	function formatRatingChange(change: number) {
 		let sign = "+";
 		if (change < 0) {
@@ -110,6 +95,17 @@
 		}
 	}
 	
+	function hasPieceVariation(game: any) {
+		const stdpieces = [0, 0, 0, 10, 15, 21, 30, 40, 50][game.size];
+		const stdcaps = [0, 0, 0, 0, 0, 1, 1, 2, 2][game.size];
+		const gpieces = game.pieces == -1 ? stdpieces : game.pieces;
+		const gcaps = game.capstones == -1 ? stdcaps : game.capstones;
+		if (gpieces != stdpieces || gcaps != stdcaps){
+			return true;
+		}
+		return false;
+	}
+	
 	function handleRequest(props: any) {
 		emit('pageEvent', props);
 	}
@@ -125,10 +121,6 @@
 	function handleDownload(game: any) {
 		emit('downloadEvent', game);
 	}
-	
-	function handleOpen(game: any, site: string){
-		emit('openEvent', game, site, true)
-	}
 
 </script>
 
@@ -140,10 +132,6 @@
 		row-key="name" 
 		v-model:pagination="pagination" 
 		:rows-per-page-options="rowsPerPage"
-		virtual-scroll
-		:virtual-scroll-item-size="57"
-		:virtual-scroll-sticky-size-start="48"
-		:virtual-scroll-sticky-size-end="50"
 		@request="handleRequest"
 		color="primary"
 		:visible-columns="visibleColumns"
@@ -172,11 +160,23 @@
 				</q-td>
 				<q-td key="rules" :props="props">
 					<span v-if="props.row.komi > 0">
-					 Komi: {{ formatKomi(props.row.komi) }}
+						Komi: {{ formatKomi(props.row.komi) }}
+						<br>
+					</span> 
+					<span v-if="hasPieceVariation(props.row)">
+						Pieces: {{props.row.pieces}}/{{props.row.capstones}}
 					</span>
 				</q-td>
 				<q-td key="clock" :props="props">
-					{{ formatTimer(props.row.timertime) }} +{{ formatTimer(props.row.timerinc)}}
+					<div v-if="props.row.date >= 1461430800000">
+						{{ props.row.timertime /60 }}m +{{ props.row.timerinc }}s inc<br />
+						<span v-if="props.row.extra_time_trigger > 0">
+							+{{props.row.extra_time_amount / 60}}m @{{props.row.extra_time_trigger}}
+							<q-tooltip anchor="center right" self="center left" :offset="[10, 10]">
+								Extra Time: adds time at specific move
+							</q-tooltip>
+						</span>
+					</div>
 				</q-td>
 				<q-td key="white" :props="props">
 					<a :href="`./?player_white=${props.row.player_white}&mirror=true`" target="_blank">{{
@@ -203,11 +203,9 @@
 						<q-btn icon="download" @click="handleDownload(props.row)" color="primary" flat />
 					</q-btn-group>
 				</q-td>
-				<q-td key="review" :props="props">
-					<q-btn-group flat rounded>
-						<q-btn label="Play Tak" @click="handleOpen(props.row, 'playtak')" color="primary" flat />
-						<q-btn label="PTN Ninja" @click="handleOpen(props.row, 'ptnninja')" color="primary" flat />
-					</q-btn-group>
+				<q-td key="review" :props="props" class="text-left">
+					<a :href="'/games/' + props.row.id + '/playtakviewer'" target="_blank" color="primary">Play Tak</a><br>
+					<a :href="'/games/' + props.row.id+ '/ninjaviewer'" target="_blank" color="primary">PTN Ninja</a>
 				</q-td>
 			</q-tr>
 		</template>
