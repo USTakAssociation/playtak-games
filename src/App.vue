@@ -82,6 +82,9 @@
 	function setSearchData(params: any) {
 		let search = params;
 		if(search.type) {
+			delete search['normal'];
+			delete search['tournament'];
+			delete search['unrated'];
 			search[search.type.value.name] = search.type.value.value;
 		}
 		if(search.size){
@@ -116,7 +119,8 @@
 			pagination.value.rowsPerPage = d.perPage;
 			pagination.value.rowsNumber = d.total;
 		} catch (error) {
-			console.error(error);
+			gameData.value = [];
+			console.error('Error', error);
 		}
 		isLoading.value = false;
 	}
