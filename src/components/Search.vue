@@ -30,11 +30,7 @@
 		{ label: '7 x 7', value: '7' },
 		{ label: '8 x 8', value: '8' },
 	];
-	const typeOptions: Array<any> = [
-		{ label: "Normal", value: { name: "normal", value: 1} },
-		{ label: "Tournament", value: { name: "tournament", value: 1 } },
-		{ label: "Unrated", value: { name: "unrated", value: 1 } },
-	];
+	const typeOptions: Array<any> = ["Normal", "Tournament", "Unrated"];
 
 	function clearForm() {
 		formData.value = { mirror: false }

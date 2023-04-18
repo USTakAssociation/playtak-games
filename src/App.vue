@@ -81,22 +81,9 @@
 
 	function setSearchData(params: any) {
 		let search = params;
-		if(search.type) {
-			delete search['normal'];
-			delete search['tournament'];
-			delete search['unrated'];
-			search[search.type.value.name] = search.type.value.value;
-		}
 		if(search.size){
 			search.size = search.size.value || search.size;
 		}
-		if (search.type === null){
-			delete search.normal;
-			delete search.tournament;
-			delete search.unrated;
-			delete search.type;
-		}
-		
 		for(const key in search) {
 			if (search[key] === null || search[key] === "") {
 				delete search[key];
