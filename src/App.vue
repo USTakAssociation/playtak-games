@@ -18,7 +18,7 @@
 		rowsNumber: 0
 	});
 	const searchData: any = ref({
-		mirror: false
+		mirror: true
 	});
 	const openSearchDialog = ref(false);
 	const openPTNDialog = ref(false);
