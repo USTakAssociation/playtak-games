@@ -1,5 +1,5 @@
 export class GameService {
-	private API_HOST = import.meta.env.VITE_API_HOST + '/games-history'
+	private API_HOST = import.meta.env.VITE_API_HOST + '/v1/games-history'
 
 	public async getGames(paginationData?: any, searchData?: any) {
 		try {
@@ -12,8 +12,7 @@ export class GameService {
 				}).toString();
 			}
 			if (searchData) {
-				let data = encodeURI(JSON.stringify({ ...searchData }));
-				path += "&" + new URLSearchParams({ search: data, });
+				path += "&" + new URLSearchParams(searchData);
 			}
 			const results = await fetch(path, {
 				method: "GET",
