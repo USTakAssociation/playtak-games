@@ -89,7 +89,9 @@ export class PTNService {
 		let ptn = '';
 
 		let wn = (game.date < 1461430800000) ? 'Anon' : game.player_white;
+		let wr = game.rating_white;
 		let bn = (game.date < 1461430800000) ? 'Anon' : game.player_black;
+		let br = game.rating_black;
 
 		ptn += this.getHeader('Site', 'PlayTak.com');
 		ptn += this.getHeader('Event', 'Online Play');
@@ -101,7 +103,9 @@ export class PTNService {
 		ptn += this.getHeader('Time', dt.split(' ')[1]);
 
 		ptn += this.getHeader('Player1', wn);
+		if (wr) ptn += this.getHeader('Rating1', wr);
 		ptn += this.getHeader('Player2', bn);
+		if (br) ptn += this.getHeader('Rating2', br);
 		ptn += this.getHeader('Clock', this.getTimerInfo(game.timertime, game.timerinc));
 		ptn += this.getHeader('Result', game.result);
 		ptn += this.getHeader('Size', game.size);
