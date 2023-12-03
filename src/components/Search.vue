@@ -50,9 +50,9 @@
 			return true;
 		}
 
-		const newReg = /^(?!.*,,)(?!.*--)\d+([-,\d]*\d+)?$/;
+		const regex = /^(?!.*,,)(?!.*--)\d+([-,\d]*\d+)?$/;
 
-		if (!newReg.test(id)) {
+		if (!regex.test(id)) {
 			setFormValidation('Invalid ID format (e.g. 123 | 123-456 | 123,456,789)');
 			return false;
 		}
