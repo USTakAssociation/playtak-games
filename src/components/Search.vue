@@ -46,14 +46,14 @@
 	
 	function validateIDField(id: string): boolean {
 		resetFormValidation();
-		const commaRegex = new RegExp("^([0-9]+,)*[0-9]+$");
-		if (commaRegex.test(id)) {
-			setFormValidation('Invalid ID format (e.g. 123,456,789,800)');
+		if(!id) {
 			return true;
 		}
-		
-		const regex = new RegExp("^([0-9]+([-,][0-9]+)?)*$");
-		if (!regex.test(id)) {
+
+		const regLookup = new RegExp("^(\d+)?|(\d+(-\d+)?|\d+(,\d+)*)$")
+		const regRestrict = /^[\d,-]+$/;
+
+		if (!regLookup.test(id) || !regRestrict.test(id)) {
 			setFormValidation('Invalid ID format (e.g. 123 | 123-456 | 123,456,789)');
 			return false;
 		}
