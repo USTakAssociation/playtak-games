@@ -50,10 +50,9 @@
 			return true;
 		}
 
-		const regLookup = new RegExp("^(\d+)?|(\d+(-\d+)?|\d+(,\d+)*)$")
-		const regRestrict = /^[\d,-]+$/;
+		const newReg = /^(?!.*,,)(?!.*--)\d+([-,\d]*\d+)?$/;
 
-		if (!regLookup.test(id) || !regRestrict.test(id)) {
+		if (!newReg.test(id)) {
 			setFormValidation('Invalid ID format (e.g. 123 | 123-456 | 123,456,789)');
 			return false;
 		}
