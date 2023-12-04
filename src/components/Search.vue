@@ -43,16 +43,15 @@
 	function sendFormData () {
 		emit('searchEvent', formData.value)
 	}
-	
+
+	const IDFieldRegex = /^(?!.*,,)(?!.*--)\d+([-,\d]*\d+)?$/;
 	function validateIDField(id: string): boolean {
 		resetFormValidation();
 		if(!id) {
 			return true;
 		}
 
-		const regex = /^(?!.*,,)(?!.*--)\d+([-,\d]*\d+)?$/;
-
-		if (!regex.test(id)) {
+		if (!IDFieldRegex.test(id)) {
 			setFormValidation('Invalid ID format (e.g. 123 | 123-456 | 123,456,789)');
 			return false;
 		}
