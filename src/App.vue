@@ -91,6 +91,13 @@
 		}
 		searchData.value = search;
 		searchGames({ pagination: toRaw(pagination).value}, search);
+		location.replace(
+			new URL(
+				`${location.origin}${location.pathname}?${new URLSearchParams(
+					search
+				)}`
+			)
+		);
 	}
 
 	async function searchGames(paginationData: any, search?: any) {
