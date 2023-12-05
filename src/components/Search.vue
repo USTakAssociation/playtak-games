@@ -11,7 +11,7 @@
 	const searchData = defineProps<{
 		data: any,
 	}>();
-	const formData: any = ref(searchData.data);
+	const formData: any = ref({});
 	const resultOptions = [
 		{ group: 'White Wins', disable: true },
 		{ label: 'X-0', value: 'X-0', description: 'Any Win' },
@@ -36,8 +36,12 @@
 	];
 	const typeOptions: Array<any> = ["Normal", "Tournament", "Unrated"];
 
+	function resetForm() {
+		formData.value = { ...searchData.data }
+	}
+
 	function clearForm() {
-		formData.value = { mirror: false }
+		formData.value = { mirror: true }
 	}
 
 	function sendFormData () {
@@ -75,13 +79,13 @@
 		}
 		return true;
 	}
-	
+
 	function setFormValidation(msg: string) {
 		formValidation.value.disable = true;
 		formValidation.value.hasError = true;
 		formValidation.value.message = msg;
 	}
-	
+
 	function resetFormValidation() {
 		formValidation.value.disable = false;
 		formValidation.value.hasError = false;
@@ -90,7 +94,7 @@
 </script>
 
 <template>
-	<q-dialog v-bind="$attrs">
+	<q-dialog v-bind="$attrs" @before-show="resetForm">
 		<q-card>
 			<q-form @submit="sendFormData" @reset="clearForm()">
 				<q-card-section class="row justify-between">
@@ -136,7 +140,7 @@
 				</q-card-section>
 
 				<q-separator />
-				
+
 				<q-card-actions align="right">
 					<q-btn flat rounded color="primary" label="Clear" type="reset" />
 					<div class="col-grow" />
