@@ -1,5 +1,5 @@
 <script setup lang="ts">
-	import { ref, onBeforeMount, toRaw } from 'vue';
+	import { ref, onBeforeMount } from 'vue';
 	import { Dark, useQuasar, LocalStorage } from 'quasar';
 	import Search from '@/components/Search.vue';
 	import TableComponent from '@/components/Table.vue'
@@ -129,17 +129,12 @@
 		paginationParamKeys
 			.filter(key => pagination.value[key] !== undefined)
 			.forEach(key => params[key] = pagination.value[key]);
-		// if (new URLSearchParams(location.search).) {
-			history.pushState({}, "", new URL(
-				`${location.origin}${location.pathname}?${new URLSearchParams(params)}`
-			));
-		// }
+		history.pushState({}, "", new URL(
+			`${location.origin}${location.pathname}?${new URLSearchParams(params)}`
+		));
 	}
 
 	async function setSearchData(params: any) {
-		if(params.size){
-			params.size = params.size.value || params.size;
-		}
 		if(params.size){
 			params.size = params.size.value || params.size;
 		}
