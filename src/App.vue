@@ -68,7 +68,7 @@
 		paginationParamKeys.forEach(copyParams(newPagination));
 		searchData.value = newSearchData;
 		pagination.value = newPagination;
-		searchGames(newPagination, newSearchData);
+		searchGames({ pagination: newPagination }, newSearchData);
 	}
 	addEventListener("popstate", setStateFromParams);
 	const openSearchDialog = ref(false);
@@ -136,7 +136,7 @@
 		// }
 	}
 
-	function setSearchData(params: any) {
+	async function setSearchData(params: any) {
 		if(params.size){
 			params.size = params.size.value || params.size;
 		}
@@ -149,12 +149,12 @@
 			}
 		}
 		searchData.value = params;
-		searchGames({...pagination.value, page: 1}, params);
+		await searchGames({ pagination: {...pagination.value, page: 1 }}, params);
 		pushState();
 	}
 
-	function setPagination() {
-		searchGames(pagination.value);
+	async function setPagination(paginationData: any) {
+		await searchGames(paginationData);
 		pushState();
 	}
 
