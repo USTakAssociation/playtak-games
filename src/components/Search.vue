@@ -109,7 +109,7 @@
 				<q-card-section style="max-height: 50vh" class="scroll q-pa-none">
 					<div class="row justify-between">
 						<q-list style="min-width: 15em;" class="col">
-							<q-input bottom-slots v-model="formData.id" label="Game ID" type="text" :rules="[(val) => validateIDField(val)]" item-aligned>
+							<q-input bottom-slots v-model="formData.id" label="Game ID" type="text" :rules="[(val) => validateIDField(val)]" lazy-rules item-aligned>
 								<template v-slot:error>
 									Error: {{ formValidation.message }}
 								</template>
