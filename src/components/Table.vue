@@ -15,8 +15,10 @@
 		pagination: {}
 	}>()
 	
+	const selected: any = ref([]);
+	
 	const columns: any= [
-		{ name: "id", label: "ID", field: "id", align: "left", headerClasses: "id" },
+		{ name: "id", label: "ID", field: "id", align: "left", headerClasses: "id-header", classes: "id-row" },
 		{ name: "size", label: "Size", field: "size", align: "left" },
 		{ name: "rules", label: "Rules", field: "rules", align: "left" },
 		{ name: "clock", label: "Clock", field: "", align: "left" },
@@ -121,6 +123,15 @@
 	function handleDownload(game: any) {
 		emit('downloadEvent', game);
 	}
+	
+	function onRowClick(row: any) {
+		const selectedArray = selected.value
+		if(selectedArray.indexOf(row)==-1) {
+			selectedArray.push(row)
+		} else{
+			selectedArray.splice(selectedArray.indexOf(row),1)
+		}
+	}
 
 </script>
 
@@ -151,8 +162,8 @@
 		</template>
 
 		<template v-slot:body="props">
-			<q-tr :props="props">
-				<q-td key="id" :props="props" style="position: sticky; left: 0; background-color: var(--q-dark); z-index: 1;">
+			<q-tr :props="props" :class="selected.indexOf(props.row)!=-1?'selected':''" @click="onRowClick(props.row)">
+				<q-td key="id" :props="props">
 					{{ props.row.id }}
 				</q-td>
 				<q-td key="size" :props="props">
@@ -238,9 +249,18 @@
 .sticky-header thead tr:first-child th {
 	top: 0;
 }
-.sticky-header thead tr .id{
+.sticky-header thead tr .id-header{
 	position: sticky;
 	z-index: 2;
 	left: 0;
+}
+.id-row {
+	position: sticky !important;
+	z-index: 1;
+	left: 0;
+	background-color: $dark !important;
+}
+.body--light .id-row {
+	background-color: $grey-1 !important;
 }
 </style>
