@@ -205,10 +205,12 @@
 
 	async function viewInfo(){
 		const dbtemp = await gameService.getDBInfo();
-		const size = formatBytes(dbtemp.size);
-		const newdate = new Date(dbtemp.mtime).toISOString().split('T');
-		const date = `${newdate[0]} ${newdate[1].split('.')[0]}`;
-		dbData.value = {size, date};
+		if(dbtemp) {
+			const size = formatBytes(dbtemp.size);
+			const newdate = new Date(dbtemp.mtime).toISOString().split('T');
+			const date = `${newdate[0]} ${newdate[1].split('.')[0]}`;
+			dbData.value = {size, date};
+		};
 		openInfoDialog.value = true;
 	}
 
@@ -320,19 +322,26 @@
 
 			<q-dialog v-model="openInfoDialog">
 				<q-card style="width: 50vw" class="q-pb-none">
-					<q-card-section class="row items-center q-pt-none">
-						<p class="q-mt-md">Games before 23rd April 2016 5:00 PM UTC are anonymized and won't appear when searching with player name</p>
-						<p>
+					<q-card-section class="column q-pt-none">
+						<p class="q-mt-md">Games before 23rd April 2016 5:00 PM UTC are anonymized and won't appear when searching by player name.</p>
+						<p class="q-mt-md">
 							Please don't scrape this site. You can directly download the database here: <br>
 							<a href="/games_anon.db.gz">Games Database</a>
-							(~{{dbData.size}}) (updated on {{dbData.date}}) <br>
-							note that the notation is in play tak server format.
+							<span v-if="dbData.size && dbData.date">(~{{dbData.size}}) (updated on {{dbData.date}})</span> <br>
+							<i>Database download link is updated everyday at 5:00 PM UTC</i> <br>
+							You can also use the Playtak API to get the games. Check out the github for help: <a href="https://github.com/USTakAssociation/playtak-api" target="_blank">Play Tak API</a> <br>
+							<i>note: game notation is in play tak server format.</i>
+						</p>
+						<h5 class="q-mt-md" style="margin: 0;">Search Notes:</h5>
+						<p class="q-mt-md">In the game ID field you can search by:
+							<ul>
+								<li>Single ID e.g. 10</li>
+								<li>Range of ID's e.g. 10-100</li>
+								<li>Comma delimited e.g. 10,20,30</li>
+							</ul>
 						</p>
 						<p>
-							The link above will be updated with latest database every day at 5:00 PM UTC.
-						</p>
-						<p>
-							In the player name search fields you can do a partial search with % at the start, end, or both. ie %ame or nam% or %am%
+							In the player name search fields you can do a partial search with % at the start, end, or both. e.g. %ame or nam% or %am%
 						</p>
 					</q-card-section>
 				</q-card>

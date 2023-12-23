@@ -16,7 +16,7 @@
 	}>()
 	
 	const columns: any= [
-		{ name: "id", label: "ID", field: "id", align: "left" },
+		{ name: "id", label: "ID", field: "id", align: "left", headerClasses: "id" },
 		{ name: "size", label: "Size", field: "size", align: "left" },
 		{ name: "rules", label: "Rules", field: "rules", align: "left" },
 		{ name: "clock", label: "Clock", field: "", align: "left" },
@@ -42,7 +42,7 @@
 		LocalStorage.getItem("visibleColumns") ||
 		['id', 'date', 'size', 'rules', 'clock', 'type', 'white', 'black', 'result', 'notation', 'review']
 	);
-	watch(visibleColumns, (value) => LocalStorage.set("visibleColumns", value));
+	watch(visibleColumns, (value: any) => LocalStorage.set("visibleColumns", value));
 
 	function formatDate(date: number){
 		let newDate = new Date(date).toISOString().split('T');
@@ -152,7 +152,7 @@
 
 		<template v-slot:body="props">
 			<q-tr :props="props">
-				<q-td key="id" :props="props">
+				<q-td key="id" :props="props" style="position: sticky; left: 0; background-color: var(--q-dark); z-index: 1;">
 					{{ props.row.id }}
 				</q-td>
 				<q-td key="size" :props="props">
@@ -237,5 +237,10 @@
 /* height of all previous header rows */
 .sticky-header thead tr:first-child th {
 	top: 0;
+}
+.sticky-header thead tr .id{
+	position: sticky;
+	z-index: 2;
+	left: 0;
 }
 </style>
