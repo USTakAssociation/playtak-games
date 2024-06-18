@@ -1,25 +1,76 @@
 <script setup lang="ts">
-	import { ref, onBeforeMount, toRaw } from 'vue';
+	import { ref, onBeforeMount } from 'vue';
 	import { Dark, useQuasar, LocalStorage } from 'quasar';
 	import Search from '@/components/Search.vue';
 	import TableComponent from '@/components/Table.vue'
 	import { PTNService } from '@/services/ptn.service';
 	import { GameService } from '@/services/game.service';
-	
+
 	const $q = useQuasar();
 	const lightMode = ref(false);
 	const isLoading = ref(false);
 	const gameData = ref([]);
 	const gameTemp: any = ref({});
 	const dbData = ref({size: '0B', date: ''});
-	const pagination = ref({
-		page: 0,
-		rowsPerPage: 50,
-		rowsNumber: 0
-	});
-	const searchData: any = ref({
-		mirror: true
-	});
+	const pagination: any = ref({});
+	const searchData: any = ref({});
+	const searchParamKeys = [
+		"id",
+		"player_white",
+		"player_black",
+		"type",
+		"game_result",
+		"size",
+		"mirror",
+	];
+	const paginationParamKeys = [
+		"page",
+		"rowsPerPage",
+		"rowsNumber",
+	];
+	const setStateFromParams = () => {
+		const newSearchData: any = {};
+		const newPagination: any = {};
+		const params: any = Object.fromEntries(
+			new URLSearchParams(location.search).entries()
+		);
+		// Set defaults
+		if ('mirror' in params) {
+			params.mirror = params.mirror === 'true';
+		} else {
+			params.mirror = true;
+		}
+		if (params.size) {
+			params.size = parseInt(params.size) || null;
+		}
+		if (params.rowsPerPage) {
+			params.rowsPerPage = parseInt(params.rowsPerPage);
+		} else {
+			params.rowsPerPage = 50;
+		}
+		if (params.page) {
+			params.page = parseInt(params.page);
+		} else {
+			params.page = 1;
+		}
+		if (params.rowsNumber) {
+			params.rowsNumber = parseInt(params.rowsNumber);
+		} else {
+			params.rowsNumber = 0;
+		}
+		const copyParams = (newParams: any) => (key: string) => {
+			let value = params[key];
+			if (value !== undefined) {
+				newParams[key] = value;
+			}
+		};
+		searchParamKeys.forEach(copyParams(newSearchData));
+		paginationParamKeys.forEach(copyParams(newPagination));
+		searchData.value = newSearchData;
+		pagination.value = newPagination;
+		searchGames({ pagination: newPagination }, newSearchData);
+	}
+	addEventListener("popstate", setStateFromParams);
 	const openSearchDialog = ref(false);
 	const openPTNDialog = ref(false);
 	const openInfoDialog = ref(false);
@@ -58,16 +109,7 @@
 						console.error(error);
 					}
 				}
-				const urlSearchParams = new URLSearchParams(window.location.search);
-				const params: any = Object.fromEntries(urlSearchParams.entries());
-				if (params['mirror'] && params['mirror'] === 'true') {
-					params['mirror'] = true;
-				}
-				if (params['size']) {
-					params['size'] = parseInt(params['size']);
-				}
-				searchData.value = Object.assign(searchData.value, params);
-				searchGames({}, params);
+				setStateFromParams();
 				break;
 		}
 	});
@@ -79,54 +121,75 @@
 		Dark.set(false);
 	}
 
-	function setSearchData(params: any) {
-		let search = params;
-		if(search.size){
-			search.size = search.size.value || search.size;
-		}
-		for(const key in search) {
-			if (search[key] === null || search[key] === "") {
-				delete search[key];
-			}
-		}
-		searchData.value = search;
-		searchGames({ pagination: toRaw(pagination).value}, search);
+	function pushState() {
+		const params: any = {};
+		searchParamKeys
+			.filter(key => searchData.value[key] !== undefined)
+			.forEach(key => params[key] = searchData.value[key]);
+		paginationParamKeys
+			.filter(key => pagination.value[key] !== undefined)
+			.forEach(key => params[key] = pagination.value[key]);
+		history.pushState({}, "", new URL(
+			`${location.origin}${location.pathname}?${new URLSearchParams(params)}`
+		));
 	}
 
-	async function searchGames(paginationData: any, search?: any) {
-		isLoading.value = true;
+	async function setSearchData(params: any) {
+		if(params.size){
+			params.size = params.size.value || params.size;
+		}
+		for(const key in params) {
+			if (params[key] === null || params[key] === "") {
+				delete params[key];
+			}
+		}
+		searchData.value = params;
+		await searchGames({ pagination: {...pagination.value, page: 1 }}, params);
+		pushState();
+	}
+
+	async function setPagination(paginationData: any) {
+		await searchGames(paginationData);
+		pushState();
+	}
+
+	async function searchGames(paginationData: any = pagination.value, search?: any) {
 		if(!search && Object.keys(searchData.value).length > 0) {
 			search = searchData.value;
 		}
 		try {
+			isLoading.value = true;
 			let d = await gameService.getGames(paginationData, search);
-			if(!d.items) return;
+			if(!d || !d.items) return;
 			gameData.value = Object.freeze(d.items);
-			pagination.value.page = d.page;
-			pagination.value.rowsPerPage = d.perPage;
-			pagination.value.rowsNumber = d.total;
+			Object.assign(pagination.value, {
+				page: d.page,
+				rowsPerPage: d.perPage,
+				rowsNumber: d.total
+			});
 		} catch (error) {
 			gameData.value = [];
 			console.error('Error', error);
+		} finally {
+			isLoading.value = false;
 		}
-		isLoading.value = false;
 	}
-	
+
 	async function getGameById(id: string) {
 		return await gameService.getGameByID(id);
 	}
-	
+
 	function updateTheme(value: boolean) {
 		LocalStorage.set("lightMode", value);
 		Dark.toggle();
 	}
-	
+
 	function viewPTN(game: any) {
 		gameTemp.value = game;
 		ptnText.value = ptnService.getPTN(game);
 		openPTNDialog.value = true;
 	}
-	
+
 	function copyPTN(game: any) {
 		try {
 			let ptn = ptnText.value;
@@ -136,19 +199,21 @@
 			navigator.clipboard.writeText(ptn);
 			$q.notify({ message: "Copied to clipboard!", position: 'top' });
 		} catch (error) {
-			
+
 		}
 	}
-	
+
 	async function viewInfo(){
 		const dbtemp = await gameService.getDBInfo();
-		const size = formatBytes(dbtemp.size);
-		const newdate = new Date(dbtemp.mtime).toISOString().split('T');
-		const date = `${newdate[0]} ${newdate[1].split('.')[0]}`;
-		dbData.value = {size, date};
+		if(dbtemp) {
+			const size = formatBytes(dbtemp.size);
+			const newdate = new Date(dbtemp.mtime).toISOString().split('T');
+			const date = `${newdate[0]} ${newdate[1].split('.')[0]}`;
+			dbData.value = {size, date};
+		};
 		openInfoDialog.value = true;
 	}
-	
+
 	function formatBytes(bytes: number, decimals = 2): string {
 		if (!+bytes) return '0 Bytes';
 		const k = 1000;
@@ -157,7 +222,7 @@
 		const i = Math.floor(Math.log(bytes) / Math.log(k))
 		return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
 	}
-	
+
 	function getZero(t: any) {
 		return t < 10 ? '0' + t : t
 	}
@@ -165,7 +230,7 @@
 	function downloadPTN(game: any){
 		var now = new Date();
 		var dt = `${now.getFullYear()}-${(now.getMonth() + 1)}-${now.getDate()}-${now.getHours()}:${getZero(now.getMinutes())}`;
-		
+
 		const url = window.URL.createObjectURL(new Blob([ptnService.getPTN(game)]));
 		const link = document.createElement('a');
 		link.href = url;
@@ -209,7 +274,7 @@
 					</div>
 				</q-toolbar-title>
 				<q-space />
-				
+
 				<q-btn href="/" stretch flat label="Play Tak" class="text-white" />
 				<q-btn stretch flat label="Info" @click="viewInfo()"/>
 				<q-toggle v-model="lightMode" color="accent" @update:model-value="updateTheme" /><q-icon name="light_mode" size="large" />
@@ -220,9 +285,9 @@
 			<TableComponent
 				class="table-wrapper"
 				:loading="isLoading"
-				:data="gameData" 
-				v-model:pagination="pagination" 
-				@page-event="searchGames" 
+				:data="gameData"
+				v-model:pagination="pagination"
+				@page-event="setPagination"
 				@copy-event="copyPTN"
 				@view-event="viewPTN"
 				@download-event="downloadPTN"
@@ -231,7 +296,7 @@
 			</TableComponent>
 
 			<Search v-model="openSearchDialog" :data="searchData" @search-event="setSearchData" />
-			
+
 			<q-dialog v-model="openPTNDialog">
 				<q-card style="width: 300px" class="q-pb-none">
 					<q-card-section class="row justify-between">
@@ -254,30 +319,37 @@
 					</q-card-actions>
 				</q-card>
 			</q-dialog>
-			
+
 			<q-dialog v-model="openInfoDialog">
 				<q-card style="width: 50vw" class="q-pb-none">
-					<q-card-section class="row items-center q-pt-none">
-						<p class="q-mt-md">Games before 23rd April 2016 5:00 PM UTC are anonymized and won't appear when searching with player name</p>
-						<p>
+					<q-card-section class="column q-pt-none">
+						<p class="q-mt-md">Games before 23rd April 2016 5:00 PM UTC are anonymized and won't appear when searching by player name.</p>
+						<p class="q-mt-md">
 							Please don't scrape this site. You can directly download the database here: <br>
 							<a href="/games_anon.db.gz">Games Database</a>
-							(~{{dbData.size}}) (updated on {{dbData.date}}) <br> 
-							note that the notation is in play tak server format.
+							<span v-if="dbData.size && dbData.date">(~{{dbData.size}}) (updated on {{dbData.date}})</span> <br>
+							<i>Database download link is updated everyday at 5:00 PM UTC</i> <br>
+							You can also use the Playtak API to get the games. Check out the github for help: <a href="https://github.com/USTakAssociation/playtak-api" target="_blank">Play Tak API</a> <br>
+							<i>note: game notation is in play tak server format.</i>
+						</p>
+						<h5 class="q-mt-md" style="margin: 0;">Search Notes:</h5>
+						<p class="q-mt-md">In the game ID field you can search by:
+							<ul>
+								<li>Single ID e.g. 10</li>
+								<li>Range of ID's e.g. 10-100</li>
+								<li>Comma delimited e.g. 10,20,30</li>
+							</ul>
 						</p>
 						<p>
-							The link above will be updated with latest database every day at 5:00 PM UTC.
-						</p>
-						<p>
-							In the player name search fields you can do a partial search with % at the start, end, or both. ie %ame or nam% or %am%
+							In the player name search fields you can do a partial search with % at the start, end, or both. e.g. %ame or nam% or %am%
 						</p>
 					</q-card-section>
 				</q-card>
 			</q-dialog>
 		</q-page-container>
-	
+
 	</q-layout>
-	
+
 </template>
 
 <style lang="scss">

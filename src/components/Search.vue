@@ -3,11 +3,15 @@
 	const emit = defineEmits<{
 		(e: 'searchEvent', props: any): void
 	}>()
-	
+	const formValidation = ref<{ disable: boolean, hasError: boolean, message: string }>({
+		disable: false,
+		hasError: false,
+		message: ''
+	})
 	const searchData = defineProps<{
 		data: any,
 	}>();
-	const formData: any = ref(searchData.data);
+	const formData: any = ref({});
 	const resultOptions = [
 		{ group: 'White Wins', disable: true },
 		{ label: 'X-0', value: 'X-0', description: 'Any Win' },
@@ -32,18 +36,65 @@
 	];
 	const typeOptions: Array<any> = ["Normal", "Tournament", "Unrated"];
 
+	function resetForm() {
+		formData.value = { ...searchData.data }
+	}
+
 	function clearForm() {
-		formData.value = { mirror: false }
+		formData.value = { mirror: true }
 	}
 
 	function sendFormData () {
 		emit('searchEvent', formData.value)
 	}
 
+	const IDFieldRegex = /^(?!.*,,)(?!.*--)\d+([-,\d]*\d+)?$/;
+	function validateIDField(id: string): boolean {
+		resetFormValidation();
+		if(!id) {
+			return true;
+		}
+
+		if (!IDFieldRegex.test(id)) {
+			setFormValidation('Invalid ID format (e.g. 123 | 123-456 | 123,456,789)');
+			return false;
+		}
+		// return flase if ending with a hyphen or comma
+		if (id.endsWith("-") || id.endsWith(",")) {
+			setFormValidation('Cannot end with a hyphen or a comma. (e.g. 123 | 123-456 | 123,456,789)');
+			return false;
+		}
+		// cannot conatin both a hyphen and a comma
+		if (id.includes("-") && id.includes(",")) {
+			setFormValidation('Cannot contain both a hyphen and a comma. (123-456 | 123,456,789)');
+			return false;
+		}
+		// if value has a hyphen check that the second number is greater than the first
+		if (id.includes("-")) {
+			const idArray = id.split("-");
+			if (parseInt(idArray[0]) >= parseInt(idArray[1])) {
+				setFormValidation('Second number must be greater than the first. (e.g. 123-456)');
+				return false;
+			}
+		}
+		return true;
+	}
+
+	function setFormValidation(msg: string) {
+		formValidation.value.disable = true;
+		formValidation.value.hasError = true;
+		formValidation.value.message = msg;
+	}
+
+	function resetFormValidation() {
+		formValidation.value.disable = false;
+		formValidation.value.hasError = false;
+		formValidation.value.message = '';
+	}
 </script>
 
 <template>
-	<q-dialog v-bind="$attrs">
+	<q-dialog v-bind="$attrs" @before-show="resetForm">
 		<q-card>
 			<q-form @submit="sendFormData" @reset="clearForm()">
 				<q-card-section class="row justify-between">
@@ -58,7 +109,12 @@
 				<q-card-section style="max-height: 50vh" class="scroll q-pa-none">
 					<div class="row justify-between">
 						<q-list style="min-width: 15em;" class="col">
-							<q-input v-model="formData.id" label="Game ID" type="number" item-aligned />
+							<q-input bottom-slots v-model="formData.id" label="Game ID" type="text" :rules="[(val) => validateIDField(val)]" lazy-rules item-aligned>
+								<template v-slot:error>
+									Error: {{ formValidation.message }}
+								</template>
+							</q-input>
+							<!-- hint -->
 							<q-input v-model="formData.player_white" label="Player White" item-aligned />
 							<q-input v-model="formData.player_black" label="Player Black" item-aligned />
 						</q-list>
@@ -84,12 +140,12 @@
 				</q-card-section>
 
 				<q-separator />
-				
+
 				<q-card-actions align="right">
 					<q-btn flat rounded color="primary" label="Clear" type="reset" />
 					<div class="col-grow" />
 					<q-btn flat rounded color="primary" label="Cancel" v-close-popup />
-					<q-btn rounded color="primary" label="Search" type="submit" v-close-popup />
+					<q-btn rounded color="primary" label="Search" type="submit" v-close-popup :disable="formValidation.disable" />
 				</q-card-actions>
 			</q-form>
 		</q-card>

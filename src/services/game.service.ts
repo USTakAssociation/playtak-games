@@ -44,6 +44,7 @@ export class GameService {
 			return await result.json();
 		} catch (error) {
 			console.error(error);
+			return null;
 		}
 	}
 }
