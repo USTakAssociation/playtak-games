@@ -34,7 +34,7 @@
 		{ label: '7 x 7', value: '7' },
 		{ label: '8 x 8', value: '8' },
 	];
-	const typeOptions: Array<any> = ["Normal", "Tournament", "Unrated"];
+	const typeOptions: Array<any> = ['Normal', 'Tournament', 'Unrated'];
 
 	function resetForm() {
 		formData.value = { ...searchData.data }
@@ -59,20 +59,20 @@
 			setFormValidation('Invalid ID format (e.g. 123 | 123-456 | 123,456,789)');
 			return false;
 		}
-		// return flase if ending with a hyphen or comma
-		if (id.endsWith("-") || id.endsWith(",")) {
+		// return false if ending with a hyphen or comma
+		if (id.endsWith('-') || id.endsWith(',')) {
 			setFormValidation('Cannot end with a hyphen or a comma. (e.g. 123 | 123-456 | 123,456,789)');
 			return false;
 		}
-		// cannot conatin both a hyphen and a comma
-		if (id.includes("-") && id.includes(",")) {
+		// cannot contain both a hyphen and a comma
+		if (id.includes('-') && id.includes(',')) {
 			setFormValidation('Cannot contain both a hyphen and a comma. (123-456 | 123,456,789)');
 			return false;
 		}
 		// if value has a hyphen check that the second number is greater than the first
-		if (id.includes("-")) {
-			const idArray = id.split("-");
-			if (parseInt(idArray[0]) >= parseInt(idArray[1])) {
+		if (id.includes('-')) {
+			const idArray = id.split('-');
+			if (parseInt(idArray[0]!) >= parseInt(idArray[1]!)) {
 				setFormValidation('Second number must be greater than the first. (e.g. 123-456)');
 				return false;
 			}
@@ -109,7 +109,7 @@
 				<q-card-section style="max-height: 50vh" class="scroll q-pa-none">
 					<div class="row justify-between">
 						<q-list style="min-width: 15em;" class="col">
-							<q-input bottom-slots v-model="formData.id" label="Game ID" type="text" :rules="[(val) => validateIDField(val)]" lazy-rules item-aligned>
+							<q-input bottom-slots v-model="formData.id" label="Game ID" type="text" :rules="[(val: any) => validateIDField(val)]" lazy-rules item-aligned>
 								<template v-slot:error>
 									Error: {{ formValidation.message }}
 								</template>

@@ -12,10 +12,10 @@ export class GameService {
 				}).toString();
 			}
 			if (searchData) {
-				path += "&" + new URLSearchParams(searchData);
+				path += '&' + new URLSearchParams(searchData);
 			}
 			const results = await fetch(path, {
-				method: "GET",
+				method: 'GET',
 			});
 			return await results.json();
 		} catch (error) {
@@ -27,7 +27,7 @@ export class GameService {
 		try {
 			const url = `${this.API_HOST}/${id}`;
 			const result = await fetch(url, {
-				method: "GET",
+				method: 'GET',
 			});
 			return await result.json();
 		} catch (error) {
@@ -39,7 +39,7 @@ export class GameService {
 		try {
 			const url = `${this.API_HOST}/db`;
 			const result = await fetch(url, {
-				method: "GET",
+				method: 'GET',
 			});
 			return await result.json();
 		} catch (error) {
