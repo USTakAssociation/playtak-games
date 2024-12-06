@@ -66,7 +66,7 @@ jobs:
                   tar -xzf artifact-prod.tar.gz -C ./playtak-games-prod-tmp
                   sudo rm -rf /var/www/html/games
                   sudo mkdir /var/www/html/games
-                  sudo mv playtak-games-prod-tmp/dist/* /var/www/html/games
+                  sudo mv playtak-games-prod-tmp/dist/spa/* /var/www/html/games
                   bash /gz-html.sh
                   sudo chown -R root:root /var/www/html
                   rm -rf playtak-games-prod-tmp

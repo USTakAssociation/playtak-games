@@ -66,7 +66,7 @@ jobs:
                   tar -xzf artifact-beta.tar.gz -C ./playtak-games-beta-tmp
                   sudo rm -rf /var/www/beta/games
                   sudo mkdir /var/www/beta/games
-                  sudo mv playtak-games-beta-tmp/dist/* /var/www/beta/games
+                  sudo mv playtak-games-beta-tmp/dist/spa/* /var/www/beta/games
                   bash /gz-beta.sh
                   sudo chown -R root:root /var/www/beta
                   rm -rf playtak-games-beta-tmp
