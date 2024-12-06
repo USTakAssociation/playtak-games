@@ -68,7 +68,7 @@ jobs:
                   sudo mkdir /var/www/beta/games
                   sudo mv playtak-games-beta-tmp/dist/spa/* /var/www/beta/games
                   bash /gz-beta.sh
-                  sudo chown -R root:root /var/www/beta
+                  sudo chown -R ubunut:ubuntu /var/www/beta/games
                   rm -rf playtak-games-beta-tmp
                   rm artifact-beta.tar.gz
                 '

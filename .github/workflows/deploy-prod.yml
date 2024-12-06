@@ -68,7 +68,7 @@ jobs:
                   sudo mkdir /var/www/html/games
                   sudo mv playtak-games-prod-tmp/dist/spa/* /var/www/html/games
                   bash /gz-html.sh
-                  sudo chown -R root:root /var/www/html
+                  sudo chown -R ubuntu:ubuntu /var/www/html/games
                   rm -rf playtak-games-prod-tmp
                   rm artifact-prod.tar.gz
                 '
