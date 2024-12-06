@@ -1,10 +1,10 @@
 <script setup lang="ts">
 	import { ref, onBeforeMount } from 'vue';
 	import { Dark, useQuasar, LocalStorage } from 'quasar';
-	import Search from '@/components/Search.vue';
-	import TableComponent from '@/components/Table.vue'
-	import { PTNService } from '@/services/ptn.service';
-	import { GameService } from '@/services/game.service';
+	import Search from 'components/Search.vue';
+	import TableComponent from 'components/Table.vue'
+	import { PTNService } from './services/ptn.service';
+	import { GameService } from './services/game.service';
 
 	const $q = useQuasar();
 	const lightMode = ref(false);
@@ -15,18 +15,18 @@
 	const pagination: any = ref({});
 	const searchData: any = ref({});
 	const searchParamKeys = [
-		"id",
-		"player_white",
-		"player_black",
-		"type",
-		"game_result",
-		"size",
-		"mirror",
+		'id',
+		'player_white',
+		'player_black',
+		'type',
+		'game_result',
+		'size',
+		'mirror',
 	];
 	const paginationParamKeys = [
-		"page",
-		"rowsPerPage",
-		"rowsNumber",
+		'page',
+		'rowsPerPage',
+		'rowsNumber',
 	];
 	const setStateFromParams = () => {
 		const newSearchData: any = {};
@@ -70,7 +70,7 @@
 		pagination.value = newPagination;
 		searchGames({ pagination: newPagination }, newSearchData);
 	}
-	addEventListener("popstate", setStateFromParams);
+	addEventListener('popstate', setStateFromParams);
 	const openSearchDialog = ref(false);
 	const openPTNDialog = ref(false);
 	const openInfoDialog = ref(false);
@@ -84,24 +84,24 @@
 		let gameData;
 		switch (path[2]) {
 			case 'playtakviewer':
-				gameData = await getGameById(path[1]);
+				gameData = await getGameById(path[1]!);
 				let pturl = `https://playtak.com/?load=${encodeURI(ptnService.getPTN(gameData))}`
 				window.location.assign(pturl);
 				break;
 			case 'ninjaviewer':
-				gameData = await getGameById(path[1]);
+				gameData = await getGameById(path[1]!);
 				let nurl = `https://ptn.ninja/${encodeURI(ptnService.getPTN(gameData))}`;
 				window.location.assign(nurl);
 				break;
 			case 'view':
-				gameData = await getGameById(path[1]);
+				gameData = await getGameById(path[1]!);
 				viewPTN(gameData);
 				searchGames({}, {});
 				break;
 			default:
-				if (path[1].length > 0 && parseInt(path[1])) {
+				if (path[1]!.length > 0 && parseInt(path[1]!)) {
 					try {
-						gameData = await getGameById(path[1]);
+						gameData = await getGameById(path[1]!);
 						if(gameData && !gameData.statusCode){
 							downloadPTN(gameData);
 						}
@@ -114,9 +114,9 @@
 		}
 	});
 
-	Dark.set("auto");
+	Dark.set('auto');
 	lightMode.value = !Dark.isActive;
-	if (LocalStorage.getItem("lightMode")) {
+	if (LocalStorage.getItem('lightMode')) {
 		lightMode.value = true;
 		Dark.set(false);
 	}
@@ -129,7 +129,7 @@
 		paginationParamKeys
 			.filter(key => pagination.value[key] !== undefined)
 			.forEach(key => params[key] = pagination.value[key]);
-		history.pushState({}, "", new URL(
+		history.pushState({}, '', new URL(
 			`${location.origin}${location.pathname}?${new URLSearchParams(params)}`
 		));
 	}
@@ -139,7 +139,7 @@
 			params.size = params.size.value || params.size;
 		}
 		for(const key in params) {
-			if (params[key] === null || params[key] === "") {
+			if (params[key] === null || params[key] === '') {
 				delete params[key];
 			}
 		}
@@ -180,7 +180,7 @@
 	}
 
 	function updateTheme(value: boolean) {
-		LocalStorage.set("lightMode", value);
+		LocalStorage.set('lightMode', value);
 		Dark.toggle();
 	}
 
@@ -197,7 +197,7 @@
 				ptn = ptnService.getPTN(game);
 			}
 			navigator.clipboard.writeText(ptn);
-			$q.notify({ message: "Copied to clipboard!", position: 'top' });
+			$q.notify({ message: 'Copied to clipboard!', position: 'top' });
 		} catch (error) {
 
 		}
@@ -208,7 +208,7 @@
 		if(dbtemp) {
 			const size = formatBytes(dbtemp.size);
 			const newdate = new Date(dbtemp.mtime).toISOString().split('T');
-			const date = `${newdate[0]} ${newdate[1].split('.')[0]}`;
+			const date = `${newdate[0]} ${newdate[1]!.split('.')[0]}`;
 			dbData.value = {size, date};
 		};
 		openInfoDialog.value = true;
@@ -242,13 +242,13 @@
 
 <template>
 	<q-layout view="hHh lpR fFf">
-		<q-header elevated class="text-white bg-secondary">
+		<q-header class="text-white bg-secondary">
 			<q-toolbar>
 				<q-toolbar-title>
 					<div class="row items-center no-wrap">
 						<div class="logo">
 							<svg class="tak-logo" version="1.1" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
-								<!-- Peice -->
+								<!-- Piece -->
 								<path class="piece"
 									d="m 42.919509,60.795211 51.601746,12.494554 a 0.0960735,0.0720914 0 0 1 0.0141,0.133019 L 58.3022,87.100923 a 0.57617763,0.4323415 0 0 1 -0.432706,0.02605 L 6.3685306,74.902911 A 0.09651292,0.07242062 0 0 1 6.3544527,74.769448 L 42.49086,60.821213 a 0.56419129,0.42335175 0 0 1 0.431348,-0.02642 z m 15.59031,26.226173 35.816588,-13.519573 c 0.115699,-0.04359 0.364696,-0.116692 0.405875,-0.03798 0.0159,0.02912 0.0123,0.134431 0.0123,0.231529 v 10.839848 c 0,0.09717 -0.002,0.261038 -0.0754,0.339527 -0.057,0.06143 -0.227517,0.126543 -0.343135,0.170133 L 58.509402,98.56444 c -0.115692,0.0436 -0.364696,0.116699 -0.405883,0.038 -0.01593,-0.02911 -0.01229,-0.134429 -0.01229,-0.231528 V 87.531053 c 0,-0.09719 0.0019,-0.261038 0.07546,-0.339515 0.05701,-0.06141 0.227511,-0.12653 0.343128,-0.170133 z M 6.5909438,74.955355 57.644437,87.07285 c 0.123447,0.02925 0.334703,0.08146 0.39989,0.162944 0.0469,0.05876 0.0469,0.197641 0.0469,0.29474 v 10.806659 c 0,0.0972 -0.01229,0.289106 -0.128586,0.304526 -0.05169,0.007 -0.1949,-0.0296 -0.31827,-0.0589 L 6.5908848,86.465349 C 6.4674374,86.436099 6.25618,86.383889 6.1909939,86.302406 6.1440949,86.243666 6.1440949,86.104778 6.1440949,86.007666 V 75.201009 c 0,-0.09719 0.01229,-0.289097 0.1285844,-0.304538 0.051699,-0.0066 0.1948856,0.02962 0.31827,0.05886 z"
 									clip-rule="evenodd" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round" />
@@ -333,16 +333,13 @@
 							<i>note: game notation is in play tak server format.</i>
 						</p>
 						<h5 class="q-mt-md" style="margin: 0;">Search Notes:</h5>
-						<p class="q-mt-md">In the game ID field you can search by:
-							<ul>
-								<li>Single ID e.g. 10</li>
-								<li>Range of ID's e.g. 10-100</li>
-								<li>Comma delimited e.g. 10,20,30</li>
-							</ul>
-						</p>
-						<p>
-							In the player name search fields you can do a partial search with % at the start, end, or both. e.g. %ame or nam% or %am%
-						</p>
+						<p class="q-mt-md">In the game ID field you can search by:</p>
+						<ul>
+							<li>Single ID e.g. 10</li>
+							<li>Range of ID's e.g. 10-100</li>
+							<li>Comma delimited e.g. 10,20,30</li>
+						</ul>
+						<p>In the player name search fields you can do a partial search with % at the start, end, or both. e.g. %ame or nam% or %am%</p>
 					</q-card-section>
 				</q-card>
 			</q-dialog>

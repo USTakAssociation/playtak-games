@@ -12,23 +12,23 @@
 	}>()
 	const tableData = defineProps<{
 		data: any,
-		pagination: {}
+		pagination: any
 	}>()
 	
 	const selected: any = ref([]);
 	
 	const columns: any= [
-		{ name: "id", label: "ID", field: "id", align: "left", headerClasses: "id-header", classes: "id-row" },
-		{ name: "size", label: "Size", field: "size", align: "left" },
-		{ name: "rules", label: "Rules", field: "rules", align: "left" },
-		{ name: "clock", label: "Clock", field: "", align: "left" },
-		{ name: "white", label: "White", field: "player_white", align: "left" },
-		{ name: "black", label: "Black", field: "player_black", align: "left" },
-		{ name: "result", label: "Result", field: "result", align: "left" },
-		{ name: "date", label: "Time UTC", field: "date", align: "left" },
-		{ name: "type", label: "Type", field: "", align: "left" },
-		{ name: "notation", label: "Notation", field: "", align: "center" },
-		{ name: "review", label: "Review", field: "", align: "center" }
+		{ name: 'id', label: 'ID', field: 'id', align: 'left', headerClasses: 'id-header', classes: 'id-row' },
+		{ name: 'size', label: 'Size', field: 'size', align: 'left' },
+		{ name: 'rules', label: 'Rules', field: 'rules', align: 'left' },
+		{ name: 'clock', label: 'Clock', field: '', align: 'left' },
+		{ name: 'white', label: 'White', field: 'player_white', align: 'left' },
+		{ name: 'black', label: 'Black', field: 'player_black', align: 'left' },
+		{ name: 'result', label: 'Result', field: 'result', align: 'left' },
+		{ name: 'date', label: 'Time UTC', field: 'date', align: 'left' },
+		{ name: 'type', label: 'Type', field: '', align: 'left' },
+		{ name: 'notation', label: 'Notation', field: '', align: 'center' },
+		{ name: 'review', label: 'Review', field: '', align: 'center' }
 	];
 	const rowsPerPage = [15, 25, 50, 100];
 	const pagination: any = computed({
@@ -41,14 +41,14 @@
 	});
 
 	const visibleColumns: any = ref(
-		LocalStorage.getItem("visibleColumns") ||
+		LocalStorage.getItem('visibleColumns') ||
 		['id', 'date', 'size', 'rules', 'clock', 'type', 'white', 'black', 'result', 'notation', 'review']
 	);
-	watch(visibleColumns, (value: any) => LocalStorage.set("visibleColumns", value));
+	watch(visibleColumns, (value: any) => LocalStorage.set('visibleColumns', value));
 
 	function formatDate(date: number){
 		let newDate = new Date(date).toISOString().split('T');
-		return `${newDate[0]} ${newDate[1].split('.')[0]}`;
+		return `${newDate[0]} ${newDate[1]!.split('.')[0]}`;
 	}
 	
 	function formatKomi(komi: number) {
@@ -58,9 +58,9 @@
 	}
 
 	function formatRatingChange(change: number) {
-		let sign = "+";
+		let sign = '+';
 		if (change < 0) {
-			sign = "-"
+			sign = '-'
 			change = -change
 		}
 		let c1 = Math.floor(change / 10).toString();
@@ -71,29 +71,29 @@
 	function generateRatingString(game: any, color: string){
 		const gametime = game.date/1000;
 		const abandonedtime = Date.now() - 3600 * 6;
-		if (game.size < 5 || game.unrated == 1 || game.rating_white==0 || game.rating_black==0 || (game.result!="0-0" && game.notation.length<6) || (game.result=="0-0" && gametime < abandonedtime) || (game.rating_change_white==-2000 && game.rating_change_black==-2000) ) {
+		if (game.size < 5 || game.unrated == 1 || game.rating_white==0 || game.rating_black==0 || (game.result!='0-0' && game.notation.length<6) || (game.result=='0-0' && gametime < abandonedtime) || (game.rating_change_white==-2000 && game.rating_change_black==-2000) ) {
 			if (game[`rating_${color}`] >= 100 ) {
 				return game[`rating_${color}`].toString();
 			}
 			
 		}else if (game.rating_change_white < 0 && game.rating_change_black < 0 ){
 			if (game[`rating_${color}`] >= 100) {
-				return game[`rating_${color}`].toString() + " +?";
+				return game[`rating_${color}`].toString() + ' +?';
 			}
 		} else{
 			if (game[`rating_${color}`] >= 100) {
-				return game[`rating_${color}`].toString() + " " + formatRatingChange(game[`rating_change_${color}`]);
+				return game[`rating_${color}`].toString() + ' ' + formatRatingChange(game[`rating_change_${color}`]);
 			}
 		}
 	}
 	
 	function getGameType(game: any) {
 		if(game.tournament === 1){
-			return "Tournament";
+			return 'Tournament';
 		} else if(game.unrated === 1){
-			return "Unrated";
+			return 'Unrated';
 		} else {
-			return "Normal";
+			return 'Normal';
 		}
 	}
 	
@@ -224,7 +224,7 @@
 </template>
 
 <style lang="scss">
-
+// $
 .sticky-header {
 	height: calc(100vh - #{$toolbar-min-height});
 }
