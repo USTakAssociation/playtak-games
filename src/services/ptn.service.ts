@@ -1,5 +1,5 @@
 export class PTNService {
-	
+
 	private getHeader(key: string, val: any){
 		return `[${key} "${val}"]\n`
 	}
@@ -40,7 +40,7 @@ export class PTNService {
 
 		return '';
 	}
-	
+
 	private getMoves(notation: string) {
 		let moves = '';
 		let count = 0;
@@ -59,8 +59,8 @@ export class PTNService {
 
 		return moves
 	}
-	
-	private getTimerInfo(timertime: number, timerinc: number){
+
+	private getTimerInfo(timertime: number, timerinc: number, incrementScales = false){
 		const secs = timertime%60
 		timertime = timertime/60
 
@@ -68,8 +68,8 @@ export class PTNService {
 		const hrs = Math.floor(timertime/60);
 		let val = ''
 		let force = false
-		
-		
+
+
 		if(hrs !== 0){
 			val += hrs.toString() + ':';
 			force = true;
@@ -79,12 +79,14 @@ export class PTNService {
 		}
 		val += secs.toString();
 		if(timerinc !== 0) {
-			val += ' +' + timerinc.toString();
+			// Non-standard: `*n` suffix indicates the increment scales with move number.
+			// Standard PTN tools will ignore the suffix; playtak-aware tools can detect it.
+			val += ' +' + timerinc.toString() + (incrementScales ? '*n' : '');
 		}
 
 		return val;
 	}
-	
+
 	public getPTN(game: any) {
 		let ptn = '';
 
@@ -106,7 +108,7 @@ export class PTNService {
 		if (wr) ptn += this.getHeader('Rating1', wr);
 		ptn += this.getHeader('Player2', bn);
 		if (br) ptn += this.getHeader('Rating2', br);
-		ptn += this.getHeader('Clock', this.getTimerInfo(game.timertime, game.timerinc));
+		ptn += this.getHeader('Clock', this.getTimerInfo(game.timertime, game.timerinc, !!game.increment_scales));
 		ptn += this.getHeader('Result', game.result);
 		ptn += this.getHeader('Size', game.size);
 		ptn += this.getHeader('Komi', (game.komi/2).toString());
@@ -115,7 +117,7 @@ export class PTNService {
 		const stdcaps = [0,0,0,0,0,1,1,2,2][game.size];
 		const gpieces = game.pieces == -1 ? stdpieces : game.pieces;
 		const gcaps = game.capstones == -1 ? stdcaps : game.capstones;
-		
+
 		ptn += this.getHeader('Flats', gpieces);
 		ptn += this.getHeader('Caps', gcaps);
 

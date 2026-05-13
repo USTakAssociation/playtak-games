@@ -14,9 +14,9 @@
 		data: any,
 		pagination: any
 	}>()
-	
+
 	const selected: any = ref([]);
-	
+
 	const columns: any= [
 		{ name: 'id', label: 'ID', field: 'id', align: 'left', headerClasses: 'id-header', classes: 'id-row' },
 		{ name: 'size', label: 'Size', field: 'size', align: 'left' },
@@ -50,7 +50,7 @@
 		let newDate = new Date(date).toISOString().split('T');
 		return `${newDate[0]} ${newDate[1]!.split('.')[0]}`;
 	}
-	
+
 	function formatKomi(komi: number) {
 		const k1 = Math.floor(komi / 2).toString();
 		const k2 = ((komi % 2) * 5).toString();
@@ -67,7 +67,7 @@
 		let c2 = (change % 10).toString();
 		return `${sign}${c1}.${c2}`;
 	}
-	
+
 	function generateRatingString(game: any, color: string){
 		const gametime = game.date/1000;
 		const abandonedtime = Date.now() - 3600 * 6;
@@ -75,7 +75,7 @@
 			if (game[`rating_${color}`] >= 100 ) {
 				return game[`rating_${color}`].toString();
 			}
-			
+
 		}else if (game.rating_change_white < 0 && game.rating_change_black < 0 ){
 			if (game[`rating_${color}`] >= 100) {
 				return game[`rating_${color}`].toString() + ' +?';
@@ -86,7 +86,7 @@
 			}
 		}
 	}
-	
+
 	function getGameType(game: any) {
 		if(game.tournament === 1){
 			return 'Tournament';
@@ -96,7 +96,7 @@
 			return 'Normal';
 		}
 	}
-	
+
 	function hasPieceVariation(game: any) {
 		const stdpieces = [0, 0, 0, 10, 15, 21, 30, 40, 50][game.size];
 		const stdcaps = [0, 0, 0, 0, 0, 1, 1, 2, 2][game.size];
@@ -107,23 +107,23 @@
 		}
 		return false;
 	}
-	
+
 	function handleRequest(props: any) {
 		emit('pageEvent', props);
 	}
-	
+
 	function handleCopyPTN(game: any) {
 		emit('copyEvent', game);
 	}
-	
+
 	function handleViewPTN(game: any) {
 		emit('viewEvent', game);
 	}
-	
+
 	function handleDownload(game: any) {
 		emit('downloadEvent', game);
 	}
-	
+
 	function onRowClick(row: any) {
 		const selectedArray = selected.value
 		if(selectedArray.indexOf(row)==-1) {
@@ -138,10 +138,10 @@
 <template>
 	<q-table
 		class="sticky-header"
-		:rows="tableData.data" 
-		:columns="columns" 
-		row-key="name" 
-		v-model:pagination="pagination" 
+		:rows="tableData.data"
+		:columns="columns"
+		row-key="name"
+		v-model:pagination="pagination"
 		:rows-per-page-options="rowsPerPage"
 		@request="handleRequest"
 		color="primary"
@@ -173,14 +173,17 @@
 					<span v-if="props.row.komi > 0">
 						Komi: {{ formatKomi(props.row.komi) }}
 						<br>
-					</span> 
+					</span>
 					<span v-if="hasPieceVariation(props.row)">
 						Pieces: {{props.row.pieces}}/{{props.row.capstones}}
 					</span>
 				</q-td>
 				<q-td key="clock" :props="props">
 					<div v-if="props.row.date >= 1461430800000">
-						{{ props.row.timertime /60 }}m +{{ props.row.timerinc }}s inc<br />
+						{{ props.row.timertime /60 }}m +{{ props.row.timerinc }}s<span v-if="props.row.increment_scales">&times;n</span> inc<br />
+						<q-tooltip v-if="props.row.increment_scales" anchor="center right" self="center left" :offset="[10, 10]">
+							Increment scales with move number
+						</q-tooltip>
 						<span v-if="props.row.extra_time_trigger > 0">
 							+{{props.row.extra_time_amount / 60}}m @{{props.row.extra_time_trigger}}
 							<q-tooltip anchor="center right" self="center left" :offset="[10, 10]">
