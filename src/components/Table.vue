@@ -57,6 +57,11 @@
 		return `${k1}.${k2}`;
 	}
 
+	// Title-case the stored PTN opening value, e.g. "double black stack" -> "Double Black Stack".
+	function formatOpening(opening: string) {
+		return opening.replace(/\b\w/g, (c) => c.toUpperCase());
+	}
+
 	function formatRatingChange(change: number) {
 		let sign = '+';
 		if (change < 0) {
@@ -176,6 +181,10 @@
 					</span>
 					<span v-if="hasPieceVariation(props.row)">
 						Pieces: {{props.row.pieces}}/{{props.row.capstones}}
+						<br>
+					</span>
+					<span v-if="props.row.opening && props.row.opening !== 'swap'">
+						{{ formatOpening(props.row.opening) }}
 					</span>
 				</q-td>
 				<q-td key="clock" :props="props">
