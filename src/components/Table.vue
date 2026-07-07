@@ -62,6 +62,23 @@
 		return opening.replace(/\b\w/g, (c) => c.toUpperCase());
 	}
 
+	// Time-control display, matching the playtak-ui seek/watch tables:
+	// "10 + 20" (min base + increment sec); "10 min" when there's no increment;
+	// with increment scaling the increment shows as n: "10 + n", "5 + 2n".
+	function formatTimeControl(game: any) {
+		const mins = game.timertime / 60;
+		const inc = Number(game.timerinc);
+		if (inc > 0) {
+			const incText = game.increment_scales ? (inc === 1 ? 'n' : `${inc}n`) : inc;
+			return `${mins} + ${incText}`;
+		}
+		return `${mins} min`;
+	}
+	// Extra ("byoyomi-style") time, e.g. "+5 min @35".
+	function formatExtraTime(game: any) {
+		return `+${game.extra_time_amount / 60} min @${game.extra_time_trigger}`;
+	}
+
 	function formatRatingChange(change: number) {
 		let sign = '+';
 		if (change < 0) {
@@ -189,12 +206,12 @@
 				</q-td>
 				<q-td key="clock" :props="props">
 					<div v-if="props.row.date >= 1461430800000">
-						{{ props.row.timertime /60 }}m +{{ props.row.timerinc }}s<span v-if="props.row.increment_scales">&times;n</span> inc<br />
+						{{ formatTimeControl(props.row) }}<br />
 						<q-tooltip v-if="props.row.increment_scales" anchor="center right" self="center left" :offset="[10, 10]">
-							Increment scales with move number
+							n is the current move number
 						</q-tooltip>
 						<span v-if="props.row.extra_time_trigger > 0">
-							+{{props.row.extra_time_amount / 60}}m @{{props.row.extra_time_trigger}}
+							{{ formatExtraTime(props.row) }}
 							<q-tooltip anchor="center right" self="center left" :offset="[10, 10]">
 								Extra Time: adds time at specific move
 							</q-tooltip>
