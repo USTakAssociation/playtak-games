@@ -41,10 +41,13 @@ export class PTNService {
 		return '';
 	}
 
-	private getMoves(notation: string) {
+	private getMoves(notation: string, opening?: string) {
 		let moves = '';
 		let count = 0;
-		const moveArray = notation.split(',')
+		// A game with no moves recorded yet has an empty notation, and
+		// ''.split(',') yields [''] rather than [], which ran the loop once and
+		// emitted a move number with nothing after it.
+		const moveArray = notation ? notation.split(',').filter((move) => move !== '') : []
 		for (let i = 0; i < moveArray.length; i++) {
 			const move = moveArray[i]
 			if (count%2 == 0){
@@ -52,6 +55,11 @@ export class PTNService {
 			}
 
 			moves += ' ';
+			// Double Black Stack opening: White's first ply places two black flats,
+			// written in PTN with a leading "2" (e.g. "2a1").
+			if (i === 0 && opening === 'double black stack') {
+				moves += '2';
+			}
 			moves += this.convertMove(move);
 
 			count += 1;
@@ -79,9 +87,10 @@ export class PTNService {
 		}
 		val += secs.toString();
 		if(timerinc !== 0) {
-			// Non-standard: `*n` suffix indicates the increment scales with move number.
-			// Standard PTN tools will ignore the suffix; playtak-aware tools can detect it.
-			val += ' +' + timerinc.toString() + (incrementScales ? '*n' : '');
+			// An increment that scales with the move number is written with a
+			// trailing "n" ("+1n" = one second per move elapsed). Standard PTN
+			// tools ignore the suffix; playtak-aware tools can detect it.
+			val += ' +' + timerinc.toString() + (incrementScales ? 'n' : '');
 		}
 
 		return val;
@@ -121,7 +130,12 @@ export class PTNService {
 		ptn += this.getHeader('Flats', gpieces);
 		ptn += this.getHeader('Caps', gcaps);
 
-		ptn += '\n' + this.getMoves(game.notation);
+		// Opening variant. Omitted for the default "swap" so legacy PTN is unchanged.
+		if (game.opening && game.opening !== 'swap') {
+			ptn += this.getHeader('Opening', game.opening);
+		}
+
+		ptn += '\n' + this.getMoves(game.notation, game.opening);
 		ptn += '\n'+game.result+'\n';
 
 		return ptn;
