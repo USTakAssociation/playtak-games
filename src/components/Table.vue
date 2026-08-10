@@ -210,7 +210,10 @@
 						<q-tooltip v-if="props.row.increment_scales" anchor="center right" self="center left" :offset="[10, 10]">
 							n is the current move number
 						</q-tooltip>
-						<span v-if="props.row.extra_time_trigger > 0">
+						<!-- Both halves, as playtak-ui requires: a trigger move with no
+						     amount to grant is not a time control, and showing it gave
+						     every such game a stray "+0 min @30". -->
+						<span v-if="props.row.extra_time_trigger > 0 && props.row.extra_time_amount > 0">
 							{{ formatExtraTime(props.row) }}
 							<q-tooltip anchor="center right" self="center left" :offset="[10, 10]">
 								Extra Time: adds time at specific move
