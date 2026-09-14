@@ -5,6 +5,10 @@
 	import TableComponent from 'components/Table.vue'
 	import { PTNService } from './services/ptn.service';
 	import { GameService } from './services/game.service';
+	import { compressToEncodedURIComponent } from 'lz-string';
+
+	const PTN_NINJA_URL = 'https://ptn.ninja/';
+	const PTN_NINJA_MAX_URL_LENGTH = 8000;
 
 	const $q = useQuasar();
 	const lightMode = ref(false);
@@ -89,9 +93,7 @@
 				window.location.assign(pturl);
 				break;
 			case 'ninjaviewer':
-				gameData = await getGameById(path[1]!);
-				let nurl = `https://ptn.ninja/${encodeURI(ptnService.getPTN(gameData))}`;
-				window.location.assign(nurl);
+				window.location.assign(await getNinjaURL(path[1]!));
 				break;
 			case 'view':
 				gameData = await getGameById(path[1]!);
@@ -177,6 +179,21 @@
 
 	async function getGameById(id: string) {
 		return await gameService.getGameByID(id);
+	}
+
+	// Only PTN Ninja links carry each move's clock, so the game can be replayed
+	// with its timing without bloating ordinary PTN exports. The PTN is
+	// compressed (PTN Ninja detects this) because ptn.ninja rejects URLs over
+	// about 8 KB. Falls back to the plain link if the clocks can't be included.
+	async function getNinjaURL(id: string) {
+		const ptnWithClocks = await gameService.getPTNWithClocks(id);
+		if (ptnWithClocks) {
+			const url = PTN_NINJA_URL + compressToEncodedURIComponent(ptnWithClocks);
+			if (url.length <= PTN_NINJA_MAX_URL_LENGTH) {
+				return url;
+			}
+		}
+		return PTN_NINJA_URL + encodeURI(ptnService.getPTN(await getGameById(id)));
 	}
 
 	function updateTheme(value: boolean) {
