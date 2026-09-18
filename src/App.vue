@@ -7,8 +7,18 @@
 	import { GameService } from './services/game.service';
 	import { compressToEncodedURIComponent } from 'lz-string';
 
-	const PTN_NINJA_URL = 'https://ptn.ninja/';
 	const PTN_NINJA_MAX_URL_LENGTH = 8000;
+
+	// PTN Ninja's beta deployment tracks PlayTak's, so local and beta builds open
+	// games there instead of in production PTN Ninja. Mirrors playtak-ui, which
+	// picks the same host for its own PTN Ninja link and embedded board.
+	function getPtnNinjaUrl() {
+		const hostname = window.location.hostname;
+		const isLocal = hostname === 'localhost' || hostname === '127.0.0.1' || hostname.indexOf('192.168.') === 0;
+		return (isLocal || window.location.host.indexOf('beta') > -1)
+			? 'https://next.ptn.ninja/'
+			: 'https://ptn.ninja/';
+	}
 
 	const $q = useQuasar();
 	const lightMode = ref(false);
@@ -188,12 +198,12 @@
 	async function getNinjaURL(id: string) {
 		const ptnWithClocks = await gameService.getPTNWithClocks(id);
 		if (ptnWithClocks) {
-			const url = PTN_NINJA_URL + compressToEncodedURIComponent(ptnWithClocks);
+			const url = getPtnNinjaUrl() + compressToEncodedURIComponent(ptnWithClocks);
 			if (url.length <= PTN_NINJA_MAX_URL_LENGTH) {
 				return url;
 			}
 		}
-		return PTN_NINJA_URL + encodeURI(ptnService.getPTN(await getGameById(id)));
+		return getPtnNinjaUrl() + encodeURI(ptnService.getPTN(await getGameById(id)));
 	}
 
 	function updateTheme(value: boolean) {
