@@ -47,3 +47,11 @@ npm run build
 pnpm build
 ```
 
+## Contributing
+
+See [CONTRIBUTING.md](docs/CONTRIBUTING.md) for guidelines on how to contribute to this project.
+
+## License
+
+MIT License © USTA see [LICENSE](LICENSE) file
+

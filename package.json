@@ -1,6 +1,7 @@
 {
   "name": "play-tak-games-history",
   "version": "0.0.0",
+  "license": "MIT",
   "scripts": {
     "lint": "eslint --ext .js,.ts,.vue ./",
     "format": "prettier --write \"**/*.{js,ts,vue,scss,html,md,json}\" --ignore-path .gitignore",
