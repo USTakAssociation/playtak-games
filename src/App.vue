@@ -5,6 +5,20 @@
 	import TableComponent from 'components/Table.vue'
 	import { PTNService } from './services/ptn.service';
 	import { GameService } from './services/game.service';
+	import { compressToEncodedURIComponent } from 'lz-string';
+
+	const PTN_NINJA_MAX_URL_LENGTH = 8000;
+
+	// PTN Ninja's beta deployment tracks PlayTak's, so local and beta builds open
+	// games there instead of in production PTN Ninja. Mirrors playtak-ui, which
+	// picks the same host for its own PTN Ninja link and embedded board.
+	function getPtnNinjaUrl() {
+		const hostname = window.location.hostname;
+		const isLocal = hostname === 'localhost' || hostname === '127.0.0.1' || hostname.indexOf('192.168.') === 0;
+		return (isLocal || window.location.host.indexOf('beta') > -1)
+			? 'https://next.ptn.ninja/'
+			: 'https://ptn.ninja/';
+	}
 
 	const $q = useQuasar();
 	const lightMode = ref(false);
@@ -89,9 +103,7 @@
 				window.location.assign(pturl);
 				break;
 			case 'ninjaviewer':
-				gameData = await getGameById(path[1]!);
-				let nurl = `https://ptn.ninja/${encodeURI(ptnService.getPTN(gameData))}`;
-				window.location.assign(nurl);
+				window.location.assign(await getNinjaURL(path[1]!));
 				break;
 			case 'view':
 				gameData = await getGameById(path[1]!);
@@ -177,6 +189,21 @@
 
 	async function getGameById(id: string) {
 		return await gameService.getGameByID(id);
+	}
+
+	// Only PTN Ninja links carry each move's clock, so the game can be replayed
+	// with its timing without bloating ordinary PTN exports. The PTN is
+	// compressed (PTN Ninja detects this) because ptn.ninja rejects URLs over
+	// about 8 KB. Falls back to the plain link if the clocks can't be included.
+	async function getNinjaURL(id: string) {
+		const ptnWithClocks = await gameService.getPTNWithClocks(id);
+		if (ptnWithClocks) {
+			const url = getPtnNinjaUrl() + compressToEncodedURIComponent(ptnWithClocks);
+			if (url.length <= PTN_NINJA_MAX_URL_LENGTH) {
+				return url;
+			}
+		}
+		return getPtnNinjaUrl() + encodeURI(ptnService.getPTN(await getGameById(id)));
 	}
 
 	function updateTheme(value: boolean) {

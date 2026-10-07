@@ -35,6 +35,23 @@ export class GameService {
 		}
 	}
 
+	// The API's PTN with each move's remaining clock written as a PTN Ninja clock
+	// note. Returns null when it can't be fetched, e.g. from an API predating the
+	// clocks option, which ignores it and still answers with plain PTN.
+	public async getPTNWithClocks(id: string): Promise<string | null> {
+		try {
+			const result = await fetch(`${this.API_HOST}/ptn/${id}?clocks=true`, {
+				method: 'GET',
+			});
+			const ptn = await result.text();
+			// A missing game is answered with a JSON error body, not PTN.
+			return result.ok && ptn.startsWith('[') ? ptn : null;
+		} catch (error) {
+			console.error(error);
+			return null;
+		}
+	}
+
 	public async getDBInfo() {
 		try {
 			const url = `${this.API_HOST}/db`;
